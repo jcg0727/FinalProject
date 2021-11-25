@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SugangApply-Mapper">
+
+	<sql id="search">
+		<if test="dept_no != null">
+			AND A.DEPT_NO = #{dept_no}
+		</if>
+		
+		<if test="class_year == '1'.toString()">
+			AND class_year = '1' 
+		</if>
+		<if test="class_year == '2'.toString()">
+			AND class_year = '2'
+		</if>
+		<if test="class_year == '3'.toString()">
+			AND class_year = '3'
+		</if>
+		<if test="class_year == '4'.toString()">
+			AND class_year = '4'
+		</if>
+		
+		<if test="class_type == 'mn'.toString()">
+			AND class_type = '전필'
+		</if>
+		<if test="class_type == 'mc'.toString()">
+			AND class_type = '전선'
+		</if>
+		<if test="class_type == 'cn'.toString()">
+			AND class_type = '교필'
+		</if>
+		<if test="class_type == 'cc'.toString()">
+			AND class_type = '교선'
+		</if>		
+		
+		<if test="class_name != null">
+			AND class_name like '%' || #{class_name} || '%'
+		</if>
+	</sql>
+
+	<select id="selectLectureList" resultType="lectureList" >
+     SELECT DISTINCT
+     
+		A.CLASS_NO as class_no_li, 
+		A.CLASS_NAME as class_name_li,
+		A.CLASS_TYPE as class_type_li,
+		A.CLASS_YEAR as class_year_li,
+		A.CLASS_GRADE as class_grade_li, 
+		
+		listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ',') 
+		within group(order by b.day desc)
+		over(partition by a.class_no) as class_day_li,
+		
+		(select count(*)
+		from lecture_register
+		WHERE 
+		LECTURE_SEMESTER = '202102'
+		AND
+		STATUS_CD='CCDN001'
+		AND
+		CLASS_NO = A.CLASS_NO)
+		
+		||'/'|| A.PERSONNEL AS class_apply_li
+		
+		FROM LECTURE A, LECTURE_TIMETABLE B
+		WHERE a.lecture_semester = b.lecture_semester
+		AND a.class_no = b.class_no        
+		<include refid="search"/>
+		
+	</select>
+	
+	<select id="selectCountLectureList" resultType="int">
+		select count(*) from
+		(
+			SELECT DISTINCT
+	     
+			A.CLASS_NO as class_no_li, 
+			A.CLASS_NAME as class_name_li,
+			A.CLASS_TYPE as class_type_li,
+			A.CLASS_YEAR as class_year_li,
+			A.CLASS_GRADE as class_grade_li, 
+			
+			listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ',') 
+			within group(order by b.day desc)
+			over(partition by a.class_no) as class_day_li,
+			
+			(select count(*)
+			from lecture_register
+			WHERE 
+			LECTURE_SEMESTER = '202102'
+			AND
+			STATUS_CD='CCDN001'
+			AND
+			CLASS_NO = A.CLASS_NO)
+			
+			||'/'|| A.PERSONNEL AS class_apply_li
+			
+			FROM LECTURE A, LECTURE_TIMETABLE B
+			WHERE a.lecture_semester = b.lecture_semester
+			AND a.class_no = b.class_no  
+			<include refid="search"/>
+		)
+	
+	</select>	
+
+	<select id="selectLectureList_year" resultType="lectureList">
+    	SELECT DISTINCT
+		A.CLASS_NO as class_no_li, 
+		A.CLASS_NAME as class_name_li,
+		A.CLASS_TYPE as class_type_li,
+		A.CLASS_YEAR as class_year_li,
+		A.CLASS_GRADE as class_grade_li, 
+		
+		listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ', ') 
+		within group(order by b.day desc)
+		over(partition by a.class_no) as class_day_li,
+		
+		(select count(*)
+		from lecture_register
+		WHERE 
+		LECTURE_SEMESTER = '202102'
+		AND
+		STATUS_CD='CCDN001'
+		AND
+		CLASS_NO = A.CLASS_NO)
+		
+		||'/'|| A.PERSONNEL AS class_apply_li
+		
+		FROM LECTURE A, LECTURE_TIMETABLE B
+		WHERE 
+		A.DEPT_NO = #{dept_no}
+		AND a.lecture_semester = b.lecture_semester
+		AND a.class_no = b.class_no
+	    AND a.class_year=(
+	    					   select 
+							        case when a.semester='0' then '1'
+							             when a.semester='1' then '1'
+							             when a.semester='2' then '2'
+							             when a.semester='3' then '2'
+							             when a.semester='4' then '3'
+							             when a.semester='5' then '3'
+							             when a.semester='6' then '4'
+							             when a.semester='7' then '4'
+							        end as student_year
+							    from
+							    (select count(distinct lecture_semester) semester
+							  		from grades
+							  		where student_no= #{student_no} )a
+	    			 	  )
+	 
+	</select>
+	
+	<select id="selectCountGausulTotalList" resultType="int">
+	        
+        SELECT COUNT (*)
+        FROM
+        (SELECT DISTINCT
+		A.CLASS_NO as class_no_li, 
+		A.CLASS_NAME as class_name_li,
+		A.CLASS_TYPE as class_type_li,
+		A.CLASS_YEAR as class_year_li,
+		A.CLASS_GRADE as class_grade_li, 
+		
+		listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ', ') 
+		within group(order by b.day desc)
+		over(partition by a.class_no) as class_day_li,
+		
+		(select count(*)
+		from lecture_register
+		WHERE 
+		LECTURE_SEMESTER = '202102'
+		AND
+		STATUS_CD='CCDR001'
+		AND
+		CLASS_NO = A.CLASS_NO)
+		
+		||'/'|| A.PERSONNEL AS class_apply_li
+		
+		FROM LECTURE A, LECTURE_TIMETABLE B
+		WHERE 
+		A.DEPT_NO = #{dept_no}
+		AND a.lecture_semester = b.lecture_semester
+		AND a.class_no = b.class_no
+	    AND a.class_year=(
+	    					   select 
+							        case when a.semester='0' then '1'
+							             when a.semester='1' then '1'
+							             when a.semester='2' then '2'
+							             when a.semester='3' then '2'
+							             when a.semester='4' then '3'
+							             when a.semester='5' then '3'
+							             when a.semester='6' then '4'
+							             when a.semester='7' then '4'
+							        end as student_year
+							    from
+							    (select count(distinct lecture_semester) semester
+							  		from grades
+							  		where student_no= #{student_no})a
+	    			 	  ))
+	</select>
+	
+	<!-- 수강신청 여부 확인 -->
+	<select id="checkLectureApplyList" resultType="int">
+	select count(*)
+	from lecture_register
+	where student_no = #{student_no}
+	and lecture_semester = '202102'
+	and class_no = #{class_no}
+	and status_cd = 'CCDN001'
+	</select>
+	
+	<!-- 보관함 여부 확인 -->
+	<select id="checkLectureBoguanList" resultType="int">
+	select count(*)
+	from lecture_register
+	where student_no = #{student_no}
+	and lecture_semester = '202102'
+	and class_no = #{class_no}
+	and status_cd = 'CCDN002'
+	</select>	
+	
+	<!-- 수강신청 -->
+	<update id="insertLectureList">
+	insert into lecture_register
+	values(	#{student_no},
+			'202102',
+			#{class_no},
+			'CCDN001')
+	</update>
+	
+	<!-- 보관함에 담기 -->
+	<update id="insertBoguanList">
+	insert into lecture_register
+	values(	#{student_no},
+			'202102',
+			#{class_no},
+			'CCDN002')
+	</update>
+	
+	<!-- 보관함 리스트 -->
+	<select id="selectBoguanList" resultType="boguan"> 
+		SELECT DISTINCT
+		A.CLASS_NAME,
+		A.class_no,
+		listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ',') 
+		within group(order by b.day desc)
+		over(partition by a.class_no) as class_day,
+		
+		(select count(*)
+		from lecture_register
+		WHERE 
+		LECTURE_SEMESTER = '202102'
+		AND
+		STATUS_CD='CCDN001'
+		AND
+		CLASS_NO = A.CLASS_NO)
+		
+		||'/'|| A.PERSONNEL AS apply_situation
+		
+		FROM LECTURE A, LECTURE_TIMETABLE B, LECTURE_REGISTER C
+		WHERE A.DEPT_NO = #{dept_no}
+		AND C.student_no = #{student_no}
+		AND a.lecture_semester = b.lecture_semester
+		AND a.class_no = b.class_no
+		AND A.LECTURE_SEMESTER = C.LECTURE_SEMESTER
+		AND C.lecture_semester = '202102'
+		AND A.CLASS_NO = C.CLASS_NO
+		AND C.STATUS_CD = 'CCDN002'
+	</select> 
+	
+	<!-- 보관함 COUNT -->
+	<select id="selectCountBoguanList" resultType="int"> 
+		select count(*) from
+		(
+			SELECT DISTINCT
+			A.CLASS_NAME,
+			A.class_no,
+			
+			listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ',') 
+			within group(order by b.day desc)
+			over(partition by a.class_no) as class_day,
+			
+			(select count(*)
+			from lecture_register
+			WHERE 
+			LECTURE_SEMESTER = '202102'
+			AND
+			STATUS_CD='CCDN001'
+			AND
+			CLASS_NO = A.CLASS_NO)
+			
+			||'/'|| A.PERSONNEL AS apply_situation
+			
+			FROM LECTURE A, LECTURE_TIMETABLE B, LECTURE_REGISTER C
+			WHERE A.DEPT_NO = #{dept_no}
+			AND C.student_no = #{student_no}
+			AND a.lecture_semester = b.lecture_semester
+			AND a.class_no = b.class_no
+			AND A.LECTURE_SEMESTER = C.LECTURE_SEMESTER
+			AND c.lecture_semester = '202102'
+			AND A.CLASS_NO = C.CLASS_NO
+			AND C.STATUS_CD = 'CCDN002'
+		)
+	</select>
+	
+	<!-- 수강신청 리스트 -->
+	<select id="selectSugangApplySuccessList" resultType="sugangApplySuccess">
+		SELECT DISTINCT
+		A.CLASS_NAME,
+		A.class_no,
+		A.class_grade,
+		
+		listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ',') 
+		within group(order by b.day desc)
+		over(partition by a.class_no) as class_day,
+		
+		(select count(*)
+		from lecture_register
+		WHERE 
+		LECTURE_SEMESTER = '202102'
+		AND
+		STATUS_CD='CCDN001'
+		AND
+		CLASS_NO = A.CLASS_NO)
+		
+		||'/'|| A.PERSONNEL AS apply_situation
+		
+		FROM LECTURE A, LECTURE_TIMETABLE B, LECTURE_REGISTER C
+		WHERE A.DEPT_NO = #{dept_no}
+		AND C.student_no = #{student_no}
+		AND a.lecture_semester = b.lecture_semester
+		AND a.class_no = b.class_no
+		AND A.LECTURE_SEMESTER = C.LECTURE_SEMESTER
+		AND c.lecture_semester = '202102'
+		AND A.CLASS_NO = C.CLASS_NO
+		AND C.STATUS_CD = 'CCDN001'
+	</select>
+	
+	<!-- 수강신청 카운트 -->
+	<select id="selectCountSugangApplySuccessList" resultType="int">
+			select count(*) from
+		(
+			SELECT DISTINCT
+			A.CLASS_NAME,
+			A.class_no,
+			
+			listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ',') 
+			within group(order by b.day desc)
+			over(partition by a.class_no) as class_day,
+			
+			(select count(*)
+			from lecture_register
+			WHERE 
+			LECTURE_SEMESTER = '202102'
+			AND
+			STATUS_CD='CCDN001'
+			AND
+			CLASS_NO = A.CLASS_NO)
+			
+			||'/'|| A.PERSONNEL AS apply_situation
+			
+			FROM LECTURE A, LECTURE_TIMETABLE B, LECTURE_REGISTER C
+			WHERE A.DEPT_NO = #{dept_no}
+			AND C.student_no = #{student_no}
+			AND a.lecture_semester = b.lecture_semester
+			AND a.class_no = b.class_no
+			AND A.LECTURE_SEMESTER = C.LECTURE_SEMESTER
+			AND c.lecture_semester = '202102'
+			AND A.CLASS_NO = C.CLASS_NO
+			AND C.STATUS_CD = 'CCDN001'
+		)
+	</select>
+	
+	
+	
+	<!-- 보관함 삭제 -->
+	<update id="deleteBoguan">
+		delete from lecture_register 
+		where student_no = #{student_no}
+		and lecture_semester = '202102'
+		and class_no = #{class_no}
+		and status_cd = 'CCDN002'
+	</update>	 
+	
+	<!-- 수강신청 취소 -->
+	<update id="deleteSugang">
+		delete from lecture_register 
+		where student_no = #{student_no}
+		and lecture_semester = '202102'
+		and class_no = #{class_no}
+		and status_cd = 'CCDN001'
+	</update>	
+
+	<!-- 보관함 -> 수강신청 성공 -->
+	<update id="changeBoguanToSugangSuccess">
+		update lecture_register 
+		set    
+		    status_cd = 'CCDN001'
+		where student_no = #{student_no}
+		and lecture_semester = '202102'
+		and class_no = #{class_no}
+	</update>
+	
+	<!-- 수강신청인원 -->
+	<select id="selectCheckApplyStatus" resultType="int">
+	select count(*)
+	from lecture_register
+	WHERE lecture_semester = '202102'
+	AND status_cd ='CCDN001'
+	AND class_no = #{class_no}
+	</select>
+	
+	<!-- 학점 계산 -->
+	<select id="selectApplyScores" resultType="int">
+	select sum(b.class_grade) as apply_score
+	from lecture_register a, lecture b
+	where a.student_no = #{student_no}
+	and a.lecture_semester = '202102'
+	and a.class_no = b.class_no
+	and a.status_cd = 'CCDN001'
+	group by a.student_no;
+	</select>
+	
+	<!-- 신청완료한 강의  요일 &시간 -->
+	<select id="SelectApplyCompleteLecture" resultType="applyCompleteLecture">
+	select distinct b.day as class_day, b.class_timec_start_cd as class_start_time, b.class_timec_end_cd as class_end_time
+	from lecture_register a, lecture_timetable b
+	where a.student_no = #{student_no}
+	and a.class_no = b.class_no
+	and a.status_cd = 'CCDN001'
+	and a.lecture_semester = '202102'
+	</select>
+	
+	<!-- 신청하려는 강의 요일 & 시간-->
+	<select id="SelectApplyExpectedLecture" resultType="applyExpectedLecture">
+	select b.day as class_day, b.class_timec_start_cd as class_start_time, b.class_timec_end_cd as class_end_time
+	from lecture a, lecture_timetable b
+	where a.class_no = b.class_no
+	and a.class_no= #{class_no}
+	</select>
+	
+		<!-- 강의계획서 조회 (수강신청 쪽) -->
+	<select id="selectLecturePlan2" resultType="lecturePlan2">
+	
+	select *
+	from 
+	(
+	select 
+	    substr(b.lecture_semester,'1','4') as lecture_year,
+	    substr(b.lecture_semester,'6','1') as lecture_semester,
+	    a.class_no,
+	    b.class_name,
+	    c.dept_nm,
+	    b.class_type,
+	    b.pro_no,
+	    e.name,
+	    e.email,
+	    e.phone,
+	    
+	    a.lecture_summary,
+	    a.lecture_goal,
+	    
+	    a.textbook_main,
+	    a.textbook_sub,
+	    
+	    a.week_1,
+	    a.week_2,
+	    a.week_3,
+	    a.week_4,
+	    a.week_5,
+	    a.week_6,
+	    a.week_7,
+	    a.week_8,
+	    a.week_9,
+	    a.week_10
+	
+	from lecture_plan a, lecture b, department c, professor d, account e
+	where a.class_no = #{class_no}
+	and a.class_no = b.class_no
+	and a.lecture_semester = b.lecture_semester
+	and b.dept_no = c.dept_cd
+	and b.pro_no = d.pro_no
+	and d.account_no = e.account_no
+	order by lecture_year desc, lecture_semester desc
+	)
+	where rownum = 1
+			
+	</select>
+	
+	<select id="selectLectureEvaluationScore" resultType="lectureEvaluationScore">
+	select AVG(Q_1) as q1,
+       AVG(Q_2) as q2,
+       AVG(Q_3) as q3,
+       AVG(Q_4) as q4,
+       AVG(Q_5) as q5
+	from lecture_evaluation
+	where class_no=#{class_no}
+	</select>
+	
+	<select id="selectLectureEvaluationQ6" resultType="str">
+	select *
+	from
+	(
+	select q_6
+	from lecture_evaluation
+	where class_no=#{class_no}
+	)
+	where rownum between 1 and 3
+	</select>
+	
+	<select id="selectApplyLessonList" resultType="applyLesson">
+
+		SELECT distinct A.CLASS_NO
+		     , A.CLASS_NAME as title
+		     , case b.day when '월' then '2021-11-15'
+		                  when '화' then '2021-11-16'
+		                  when '수' then '2021-11-17'
+		                  when '목' then '2021-11-18'
+		                  when '금' then '2021-11-19'
+		        end || ' ' || (select to_char(start_time,'hh24:mi:ss') from class_time where class_timec_cd = b.class_timec_start_cd) as class_start_day
+		     , case b.day when '월' then '2021-11-15'
+		                  when '화' then '2021-11-16'
+		                  when '수' then '2021-11-17'
+		                  when '목' then '2021-11-18'
+		                  when '금' then '2021-11-19'
+		        end || ' ' || (select to_char(end_time,'hh24:mi:ss') from class_time where class_timec_cd = b.class_timec_end_cd) as class_end_day
+		FROM LECTURE A, LECTURE_TIMETABLE B, LECTURE_REGISTER C, CLASS_TIME D
+		WHERE C.student_no = #{student_no}
+		AND a.lecture_semester = b.lecture_semester
+		AND a.class_no = b.class_no
+		AND A.LECTURE_SEMESTER = C.LECTURE_SEMESTER
+		AND c.lecture_semester = '202102'
+		AND A.CLASS_NO = C.CLASS_NO
+		AND C.STATUS_CD = 'CCDN001'	
+	</select>
+	
+</mapper>

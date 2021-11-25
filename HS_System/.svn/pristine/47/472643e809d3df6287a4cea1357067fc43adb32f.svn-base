@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Scholar-Mapper">
+
+	<sql id="lectureSemester">
+		<if
+			test="cri.lecture_semester != null and cri.lecture_semester != ''">
+			and a.lecture_semester = #{cri.lecture_semester}
+		</if>
+	</sql>
+
+	<sql id="deptNm">
+		<if test="cri.dept_nm != null and cri.dept_nm != ''">
+			and b.dept_nm = #{cri.dept_nm}
+		</if>
+	</sql>
+
+
+	<sql id="grade">
+		<if test="cri.searchType != null and cri.searchType!= ''">
+			and d.grade = #{cri.searchType}
+		</if>
+	</sql>
+
+	<sql id="statusCd">
+		<if test="cri.searchType2 != null and cri.searchType2 != ''">
+			and f.status_cd like #{cri.searchType2}
+		</if>
+	</sql>
+
+	<sql id="studentNo">
+		<if test="cri.keyword != null">
+			and a.student_no like '%'||#{cri.keyword}||'%'
+		</if>
+	</sql>
+
+
+
+	<select id="selectDeptNmDeptStaff" resultType="str">
+		select dept_nm
+		from department where dept_cd=(select dept_cd from staff where
+		staff_no=#{staff_no})
+	</select>
+
+	<!-- 공통 -->
+	<select id="selectStuDetail" resultType="scholarVO">
+		select a.academic_year, c.dept_nm, a.student_no, d.name,
+		trunc(avg(grades_avg),1) as grades_avg, sum(f.class_grade) as
+		regist_score
+		from grades a, student b, department c, account d, lecture
+		f
+		where a.student_no = b.student_no and
+		b.dept_cd = c.dept_cd and
+		b.account_no = d.account_no and
+		a.class_no = f.class_no and
+		b.student_no = #{student_no}
+		<include refid="lectureSemester" />
+		group by a.academic_year, c.dept_nm, a.student_no, d.name
+	</select>
+
+	<!-- 학과조교 -->
+	<!-- 해당학과 학생 성적조회 -->
+	<select id="selectStudentDeptStaffScoreList"
+		resultType="scholarVO">
+		<include refid="Common-Mapper.PageHeader" />
+		select rank() over (partition by b.dept_nm, d.grade order by
+		avg(a.grades_avg) desc) as rank,
+		to_char(trunc(avg(a.grades_avg),2),
+		'FM9.00') as grades_avg,
+		d.grade,
+		b.dept_nm,
+		a.student_no,
+		c.name,
+		f.status_cd,
+		count(*) as reScore,
+		f.recommend_date
+		from grades a,
+		department b, account c, student d, staff e, scholar f
+		where
+		a.student_no = d.student_no and
+		b.dept_cd = d.dept_cd and
+		c.account_no =
+		d.account_no and
+		d.dept_cd = e.dept_cd and
+		d.student_no =
+		f.student_no(+) and
+		e.staff_no = #{staff_no}
+		<!-- and a.lecture_semester = '202101' -->
+		<include refid="lectureSemester" />
+		<include refid="grade" />
+		<include refid="statusCd" />
+		<include refid="studentNo" />
+		group by b.dept_nm,
+		a.student_no,
+		c.name,
+		f.status_cd,
+		d.grade,
+		f.recommend_date
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+
+
+	<!-- 학과교직원 장학 추천 -->
+	<update id="insertDeptStaffScholar">
+		insert into scholar(recommend_date, student_no,
+		status_cd, semester )
+		values(sysdate, #{student_no}, 'CCDW001',
+		'202102')
+	</update>
+
+	<!-- 장학 추천 취소 -->
+	<update id="deleteDeptStaffScholarStu">
+		delete from scholar
+		where student_no = #{student_no}
+		and
+		to_char(recommend_date, 'yyyy-MM-dd') = #{recommend_date}
+	</update>
+
+
+
+	<!-- 장학처 -->
+	<!-- 전체 리스트 조회 -->
+	<select id="selectStudentScholarRecommend"
+		resultType="scholarVO">
+		<include refid="Common-Mapper.PageHeader" />
+		select rank() over (partition by b.dept_nm, d.grade order by
+		avg(a.grades_avg) desc) as rank,
+		to_char(trunc(avg(a.grades_avg),2),
+		'FM9.00') as grades_avg,
+		d.grade,
+		b.dept_nm,
+		a.student_no,
+		c.name,
+		f.status_cd,
+		f.recommend_date,
+		count(*) as reScore,
+		f.scholar_amount
+		from
+		grades a, department b, account c, student d, scholar f
+		where
+		a.student_no = d.student_no and
+		b.dept_cd = d.dept_cd and
+		c.account_no =
+		d.account_no and
+		d.student_no = f.student_no(+)
+		<!-- and a.lecture_semester = '202101' and f.status_cd is not null -->
+		<include refid="lectureSemester" />
+		<include refid="deptNm" />
+		<include refid="grade" />
+		<include refid="statusCd" />
+		<include refid="studentNo" />
+		group by b.dept_nm,
+		a.student_no,
+		c.name,
+		f.status_cd,
+		d.grade,
+		f.recommend_date,
+		f.scholar_amount
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+
+
+	<!-- 장학처 승인 -->
+	<update id="updateScholarStaffStu">
+		update scholar
+		set status_cd = 'CCDW002',
+		scholar_amount = #{scholar_amount},
+		semester = #{semester}
+		where
+		student_no = #{student_no} and
+		to_char(recommend_date, 'yyyy-MM-dd') =
+		#{recommend_date}
+	</update>
+
+	<!-- 장학금액 차감 -->
+	<update id="updateScholarStaffTutionAmount">
+		update tuition
+		set payment_amount = to_char(4150550 -
+		to_number(#{scholar_amount}))
+		where student_no = #{student_no} and
+		semester = #{semester}
+	</update>
+
+	<update id="DeleteScholarStaffStu">
+		update scholar
+		set status_cd = 'CCDW003',
+		scholar_amount = ''
+		where student_no = #{student_no} and
+		to_char(recommend_date, 'yyyy-MM-dd') = #{recommend_date}
+	</update>
+
+	<!-- 장학내역조회 -->
+	<select id="selectScholar" resultType="scholarVO">
+		<include refid="Common-Mapper.PageHeader" />
+		select SCHOLAR_AMOUNT,SEMESTER,RECOMMEND_DATE
+		from scholar
+		where
+		STATUS_CD='CCDW002'
+		and student_no=#{student_no}
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+</mapper>

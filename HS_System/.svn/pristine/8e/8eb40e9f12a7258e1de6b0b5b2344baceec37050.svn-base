@@ -1,0 +1,34 @@
+package kr.ac.hs.service.lecture;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import kr.ac.hs.dao.lecture.LectureManagementProfDAO;
+import kr.ac.hs.dto.lecture.LectureManagemenProfVO;
+
+public class LectureManagementProfServiceImpl implements LectureManagementProfService{
+	
+	private LectureManagementProfDAO lectureManagementcProfDAO;
+	
+	public void setLectureManagementProfDAO (LectureManagementProfDAO lectureManagementcProfDAO) {
+		this.lectureManagementcProfDAO = lectureManagementcProfDAO;
+	}
+	
+	// 교수 강의조회
+	@Override
+	public List<LectureManagemenProfVO> getLectureList_prof(String pro_no) throws SQLException {
+		List<LectureManagemenProfVO> lectureList_prof = lectureManagementcProfDAO.selectLectureList_prof(pro_no);
+		return lectureList_prof;
+	}
+
+	
+
+
+
+
+	
+	
+
+}

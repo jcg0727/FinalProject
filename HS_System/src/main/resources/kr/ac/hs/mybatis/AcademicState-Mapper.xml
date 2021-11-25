@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AcademicState-Mapper">
+
+	<!-- 일반휴학 a_status_cd : 일반휴학 CCDB001 a_status_cd : 신청완료 CCDF001 status_cd 
+		: 상태코드 8번(신청완료) -->
+	<update id="insertLeaveAcademicState"
+		parameterType="academicState">
+		insert into academic_state(register_date,
+		student_no,
+		register_reason,
+		start_date,
+		end_date,
+		a_status_cd,
+		r_status_cd,
+		register_semester)
+		values(sysdate,#{student_no},#{register_reason},#{start_date},#{end_date},#{a_status_cd},'CCDF001',#{register_semester})
+	</update>
+
+	<!-- 군 휴학 a_status_cd : 군휴학 CCDB002 a_status_cd : 신청완료 CCDF001 register_semester 
+		: 4학기 -->
+	<update id="insertArmyAcademicState"
+		parameterType="academicState">
+		insert into academic_state(register_date,
+		student_no,
+		register_reason,
+		start_date,
+		end_date,
+		a_status_cd,
+		r_status_cd,
+		register_semester)
+		values(sysdate,#{student_no},#{register_reason},#{start_date},#{end_date},#{a_status_cd},'CCDF001',#{register_semester})
+	</update>
+
+	<!-- 질병 휴학 a_status_cd : 질병휴학 CCDB003 a_status_cd : 신청완료 CCDF001 -->
+	<update id="insertDiseaseAcademicState"
+		parameterType="academicState">
+		insert into academic_state(register_date,
+		student_no,
+		register_reason,
+		start_date,
+		end_date,
+		a_status_cd,
+		r_status_cd,
+		register_semester)
+		values(sysdate,#{student_no},#{register_reason},#{start_date},#{end_date},#{a_status_cd},'CCDF001',#{register_semester})
+	</update>
+
+
+	<!-- 휴학이력조회 -->
+	<select id="selectLeaveAcademicStateByStudentNO"
+		resultType="academicState">
+		select ROW_NUMBER() over(ORDER BY a.register_date desc) as
+		academic_state_no
+		,a.* from academic_state a
+		where student_no =
+		#{student_no}
+		and a_status_cd like 'CCDB%' 
+		order by register_date desc
+	</select>
+
+	<update id="insertAcademicAttach">
+		insert into academic_attach (
+		register_date,
+		student_no,
+		attach_no,
+		delete_whether
+		)
+		values (
+		sysdate,
+		#{student_no},
+		#{attach_no},
+		#{delete_whether}
+		)
+	</update>
+
+	<!-- status_cd가 신청완료인 상태만 delete -->
+	<update id="deleteLeaveAcademicState">
+		delete from academic_state
+		where
+		student_no=#{student_no}
+		and
+		to_char(#{register_date}, 'yyyyMMdd')=to_char(#{register_date}, 'yyyyMMdd')
+		and r_status_cd = 'CCDF001'
+	</update>
+	
+	
+	
+	
+
+
+	<!-- 일반복학, 군복학, 질병복학 학적변동일련번호 CCDC001,CCDC002,CCDC003번 a_status_cd : -->
+	<update id="insertReturnAcademicState">
+		insert into
+		academic_state(
+		register_date,
+		student_no,
+		register_reason,
+		a_status_cd,
+		r_status_cd
+		)
+		values(sysdate,#{student_no},#{register_reason},#{a_status_cd},'CCDF001')
+	</update>
+
+	<!-- 복학 신청이력 조회 -->
+	<select id="selectReturnAcademicState" parameterType="String"
+		resultType="academicState">
+		select ROW_NUMBER() over(ORDER BY a.register_date desc) as
+		academic_state_no,
+		a.* from academic_state a
+		where student_no =
+		#{student_no} and
+		a_status_cd like 'CCDC%'
+	</select>
+
+	<update id="deleteReturnAcademicState">
+		delete from academic_state 
+		where student_no=#{student_no} and 
+        register_date >= to_date(#{register_date});
+	</update>
+
+
+	<!-- 자퇴부분 made by jej, 수정시 꼭 알려주세요 -->
+
+	<!-- 자퇴신청 이력조회 -->
+	<select id="selectAcademicDropByStudentNO"
+		resultType="academicState">
+		select
+		row_number() over(order by register_date desc) as
+		academic_state_no ,a.*
+		from
+		academic_state a
+		where a.A_STATUS_CD like
+		'CCDA%'
+		order by academic_state_no desc
+	</select>
+
+	<!-- 자퇴신청 -->
+	<!-- 자퇴상태코드: CCDA003 -->
+	<!-- 신청완료 CCDF001 -->
+	<update id="insertAcademicDrop" parameterType="academicState">
+		INSERT INTO
+		ACADEMIC_STATE(REGISTER_DATE,
+		STUDENT_NO,
+		REGISTER_REASON,
+		REGISTER_SEMESTER,
+		A_STATUS_CD,
+		R_STATUS_CD) VALUES
+		(SYSDATE,
+		#{student_no},#{register_reason},'2학기','CCDA003',#{r_status_cd})
+	</update>
+
+	<!-- 자퇴신청 취소(삭제) -->
+	<update id="deleteAcademicDrop">
+		delete from academic_state
+		where
+		student_no=#{student_no}
+		and A_STATUS_CD like 'CCDA%'
+		and R_STATUS_CD
+		like '%CCDF001%'
+	</update>
+
+
+
+</mapper>

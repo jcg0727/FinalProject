@@ -1,0 +1,75 @@
+package kr.ac.hs.controller.grades;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.ac.hs.command.grades.scoreCommand;
+import kr.ac.hs.dto.AccountVO;
+import kr.ac.hs.dto.grades.GradesVO;
+import kr.ac.hs.service.grades.GradesService;
+
+@Controller
+@RequestMapping("/score")
+public class GradesController {
+
+	@Autowired
+	private GradesService gradesService;
+
+	@RequestMapping("/management_st")
+	public String gradesMain(Model model, HttpSession session) throws Exception {
+		String url = "grades/gradesStudent";
+
+		AccountVO account = (AccountVO) session.getAttribute("loginUser");
+		GradesVO totalGrades = gradesService.getTotalGradesByStudentNo(account.getStudent_no());
+		List<String> semesterList = gradesService.getSemesterListByStudentNo(account.getStudent_no());
+
+		model.addAttribute("totalGrades", totalGrades);
+		model.addAttribute("semesterList", semesterList);
+		return url;
+	}
+
+	@RequestMapping("/management_st/thisSemester")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getThisSemensterGrades(@RequestBody scoreCommand cmd,
+			HttpSession session) throws Exception {
+		ResponseEntity<Map<String, Object>> entity = null;
+
+		GradesVO grades = cmd.convertGradesVO(session);
+		try {
+			Map<String, Object> dataMap = gradesService.getThisSemesterGradesByStudentNo(grades, cmd);
+			entity = new ResponseEntity<Map<String, Object>>(dataMap, HttpStatus.OK);
+		} catch (SQLException e) {
+			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		return entity;
+	}
+
+	@RequestMapping("/management_st/eachSemester")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getEachSemensterGrades(@RequestBody scoreCommand cmd,
+			HttpSession session) throws Exception {
+		ResponseEntity<Map<String, Object>> entity = null;
+
+		GradesVO grades = cmd.convertGradesVO(session);
+		try {
+			Map<String, Object> dataMpa = gradesService.getGradesBySemester(grades, cmd);
+			entity = new ResponseEntity<Map<String, Object>>(dataMpa, HttpStatus.OK);
+		} catch (SQLException e) {
+			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+}

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+	xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 인증 -->
+	<authentication-manager>
+		<authentication-provider ref="authenticator" />
+	</authentication-manager>
+
+	<beans:bean id="authenticator"
+		class="kr.ac.hs.security.CustomAuthenticationProvider"
+		p:professorDAO-ref="professorDAO" p:staffDAO-ref="staffDAO"
+		p:studentDAO-ref="studentDAO" />
+
+	<!-- 인허가 -->
+	<http pattern="/resources/**" security="none" />
+	<http use-expressions="true" pattern="/**">
+		<access-denied-handler
+			error-page="/security/accessDenied" />
+		
+		<!-- academic -->
+		<intercept-url pattern="/index.do*" access="isAuthenticated()" />
+		<intercept-url pattern="/main.do*" access="isAuthenticated()" />
+		<intercept-url pattern="/academic/management_st" access="hasRole('ROLE_STUDENT')"/>
+		<intercept-url pattern="/academic/management_as" access="hasAnyRole('ROLE_ACADEMIC,ROLE_SCHOLAR,ROLE_STAFF')"/>
+		<intercept-url pattern="/academic/fluctuation_st" access="hasRole('ROLE_STUDENT')"/>
+		<intercept-url pattern="/academic/fluctuation_as" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC')"/>
+		<intercept-url pattern="/academic/fluctuation_prof" access="hasRole('ROLE_PROFESSOR')"/>
+		<intercept-url pattern="/academic/admission/candidate" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC')"/>
+		<intercept-url pattern="/academic/admission/freshmen" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC')"/>
+		
+		<!-- curriculum, -->
+		<intercept-url pattern="/curriculum/management" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC')"/>
+		
+		<!-- sugang -->
+		<intercept-url pattern="/sugang/guide_as" access="hasRole('ROLE_ACADEMIC')"/>
+		<intercept-url pattern="/sugang/guide_st" access="hasRole('ROLE_STUDENT')"/>
+		<intercept-url pattern="/sugang/list" access="hasRole('ROLE_STUDENT')"/>
+		
+		<!-- lecture -->
+		<intercept-url pattern="/lecture/openLecture" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC')"/>
+		<intercept-url pattern="/lecture/lectureTime" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC')"/>
+		<intercept-url pattern="/lecture/management_st" access="hasRole('ROLE_STUDENT')"/>
+		<intercept-url pattern="/lecture/management_prof" access="hasRole('ROLE_PROFESSOR')"/>
+		<intercept-url pattern="/lecture/rest_prof" access="hasRole('ROLE_PROFESSOR')"/>
+		
+		<!-- score -->
+		<intercept-url pattern="/score/management_st" access="hasRole('ROLE_STUDENT')"/>
+		<intercept-url pattern="/score/management_prof" access="hasRole('ROLE_PROFESSOR')"/>
+		
+		<!-- tuition -->
+		<intercept-url pattern="/tuition/pay" access="hasRole('ROLE_STUDENT')"/>
+		<intercept-url pattern="/tuition/management" access="hasAnyRole('ROLE_STAFF,ROLE_SCHOLAR')"/>
+		
+		<!-- graduation -->
+		<intercept-url pattern="/graduation/management_st" access="hasRole('ROLE_STUDENT')"/>
+		<intercept-url pattern="/graduation/management_prof" access="hasRole('ROLE_PROFESSOR')"/>
+		<intercept-url pattern="/graduation/management2" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC')"/>
+		
+		<!-- counsel -->
+		<intercept-url pattern="/counsel/management_st" access="hasRole('ROLE_STUDENT')"/>
+		<intercept-url pattern="/counsel/management_prof" access="hasRole('ROLE_PROFESSOR')"/>
+		
+		<!-- personnel -->
+		<intercept-url pattern="/personnel/management" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC,ROLE_SCHOLAR')"/>
+		<intercept-url pattern="/personnel/management/personnelList" access="hasRole('ROLE_ACADEMIC')"/>
+		<intercept-url pattern="/personnel/recruitment/professor" access="hasRole('ROLE_ACADEMIC')"/>
+		<intercept-url pattern="/personnel/recruitment/employee" access="hasRole('ROLE_ACADEMIC')"/>
+		<intercept-url pattern="/personnel/attandance/attendance" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC,ROLE_SCHOLAR')"/>
+		<intercept-url pattern="/personnel/attandance/holiday" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC,ROLE_SCHOLAR')"/>
+		<intercept-url pattern="/personel/connection" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC,ROLE_SCHOLAR')"/>
+		
+		<!-- major -->
+		<intercept-url pattern="/major/management" access="hasRole('ROLE_ACADEMIC')"/>
+		
+		<!-- research -->
+		<intercept-url pattern="/research/management" access="hasRole('ROLE_PROFESSOR')"/>
+		
+		<!-- system -->
+		<intercept-url pattern="/system/management" access="hasRole('ROLE_ADMIN')"/>
+		<intercept-url pattern="/system/Qna_st" access="hasRole('ROLE_STUDENT')"/>
+		<intercept-url pattern="/system/Qna_prof" access="hasRole('ROLE_PROFESSOR')"/>
+		<intercept-url pattern="/system/Qna_ad" access="hasRole('ROLE_ADMIN')"/>
+		<intercept-url pattern="/system/Qna_as" access="hasAnyRole('ROLE_STAFF,ROLE_ACADEMIC,ROLE_SCHOLAR')"/>
+		
+		<intercept-url pattern="/**" access="permitAll" />
+
+		<!-- 로그인 -->
+		<form-login login-page="/common/loginForm.do?error=1"
+			login-processing-url="/common/login.do" 
+			username-parameter="id"
+			password-parameter="pwd"
+			authentication-success-handler-ref="loginSuccessHandler"
+			authentication-failure-handler-ref="loginFailureHandler" />
+
+		<!-- 로그아웃 -->
+		<logout logout-url="/commons/logout.do" invalidate-session="true"
+			logout-success-url="/" />
+		
+		<!-- 세션 -->
+		<session-management invalid-session-url="/common/loginTimeOut">
+			<concurrency-control expired-url="/common/loginExpired" session-registry-ref="sessionRegistry" />
+		</session-management>
+	</http>
+
+	
+	
+	<!-- 로그인 성공 -->
+	<beans:bean id="loginSuccessHandler"
+		class="kr.ac.hs.security.LoginSuccessHandler"
+		p:defaultTargetUrl="/" />
+
+
+	<!-- 로그인 실패 -->
+	<beans:bean id="loginFailureHandler"
+		class="kr.ac.hs.security.LoginFailureHandler" />
+
+	<beans:bean id="sessionRegistry"
+		class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+
+
+
+
+</beans:beans>

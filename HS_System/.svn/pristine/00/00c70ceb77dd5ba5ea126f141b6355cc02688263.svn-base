@@ -1,0 +1,28 @@
+package kr.ac.hs.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.ac.hs.dto.AccountVO;
+
+public interface AccountDAO {
+
+	//보안레벨 설정
+	public void updateSecurityLevel(AccountVO account) throws SQLException;
+
+	AccountVO selectSecurityLevel(AccountVO account) throws SQLException;
+
+	// 학생아이디 찾기
+	public AccountVO selectStuId(AccountVO account) throws SQLException;
+
+	// 교직원아이디 찾기
+	public List<AccountVO> selectStaffId(String name, String reg_no) throws SQLException;
+
+	// 교수아이디 찾기
+	public List<AccountVO> selectProId(String name, String reg_no) throws SQLException;
+
+	// 비밀번호 변경
+	public void updatePw(AccountVO account) throws SQLException;
+
+}

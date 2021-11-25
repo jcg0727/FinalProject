@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Tuition-Mapper">
+	
+	<select id="selectTuitionList" resultType="tuitionVO">
+		select semester, student_no, tuition_amount, payment_amount, payment_date
+		  from tuition
+		 where student_no = #{student_no}
+	</select>
+	
+	<select id="selectTuitionDetail" resultType="tuitionVO">
+		select a.semester,
+		       (select dept_nm from department where student_no = #{student_no}),
+		       a.tuition_amount, 
+		       a.payment_amount,
+   		       c.name,
+   		       c.reg_no 
+	      from tuition a, student b, account c
+	    where a.student_no = #{student_no} and
+	     	  a.semester = #{semester}
+	</select>
+</mapper>

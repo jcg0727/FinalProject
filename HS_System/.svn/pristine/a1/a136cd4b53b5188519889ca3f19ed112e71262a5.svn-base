@@ -1,0 +1,207 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page trimDirectiveWhitespaces="true"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@include file="../include/js.jsp"%>
+<jsp:include page="/WEB-INF/views/include/style.jsp"></jsp:include>
+<link href="<%=request.getContextPath()%>/resources/fullCalendar/lib/mainCalender.css" rel='stylesheet' />
+<script src='<%=request.getContextPath()%>/resources/fullCalendar/lib/mainCalender.js'></script>
+<script src='<%=request.getContextPath()%>/resources/fullCalendar/lib/locales-all.js'></script>
+
+
+<c:set var="pageMaker" value="${dataMap.pageMaker }" />
+<c:set var="cri" value="${pageMaker.cri }" />
+<c:set var="noticeList" value="${dataMap.noticeList }" />
+<c:set var="YList" value="${YList }" />
+
+<head>
+<title>Insert title here</title>
+<style>
+#calendar {
+	width: 100%;
+	margin: 20px auto;
+}
+
+.fc-event-title-container {
+	opacity: 100%;
+}
+
+.fc-scrollgrid-sync-inner {
+	opacity: 80%;
+}
+
+.fc .fc-button-primary {
+	background-color: #2a5f9e;
+	border-color: #2a5f9e;
+}
+
+.fc .fc-button-primary:disabled {
+	background-color: #396ba7;
+	border-color: #396ba7;
+}
+
+.fc-daygrid-day-number, .fc-col-header-cell-cushion {
+	color: black;
+}
+
+.fc-sun {
+	color: #e31b23
+}
+
+.fc-sat {
+	color: #007dc3
+}
+</style>
+<script>
+	document
+			.addEventListener(
+					'DOMContentLoaded',
+					function() {
+						var calendarEl = document.getElementById('calendar');
+
+						var calendar = new FullCalendar.Calendar(
+								calendarEl,
+								{
+									aspectRatio : 2.2,
+									locale : "ko",
+									titleFormat : function(date) { // title 설정
+										return date.date.year + "년 "
+												+ (date.date.month + 1) + "월";
+									},
+									googleCalendarApiKey : 'AIzaSyCc8lxvvtyvHfa6dAfIr8kEVFxgVHpOT2A',
+									eventSources : [
+											{
+												googleCalendarId : 'o4s268iinvl21sr93kbbotpqoc@group.calendar.google.com',
+												className : '수시모집',
+												color : '#ff8c00', //rgb,#ffffff 등의 형식으로 할 수 있어요.
+											//textColor: 'black' 
+											},
+
+											{
+												googleCalendarId : 'ko.south_korea#holiday@group.v.calendar.google.com',
+												className : '대한민국의 공휴일',
+												color : '#800080 ', //rgb,#ffffff 등의 형식으로 할 수 있어요.
+
+											},
+
+											{
+												googleCalendarId : 'cjnfjrq1gdo37vjeosjivkl6jc@group.calendar.google.com',
+												className : '2학기 시험기간',
+												color : '#ffff00',
+												textColor : "#000000"
+											},
+											{
+												googleCalendarId : '6jc0nr7682989gd939hqpqmn78@group.calendar.google.com',
+												className : '개강종강',
+												color : '#ff0000',
+											},
+											{
+												googleCalendarId : 'fjf8g2c41r967nmdcgt0sumd7k@group.calendar.google.com',
+												className : '수강신청',
+												color : '#0000ff',
+											},
+
+									],
+									eventClick : function(info) {
+										info.jsEvent.stopPropagation();
+										info.jsEvent.preventDefault();
+									}
+								});
+						calendar.render();
+					})
+</script>
+</head>
+<body>
+	<%-- <c:forEach items="${YList }" var="y">
+<p>${y.title }</p>
+</c:forEach>
+<c:forEach items="${noticeList }" var="n">
+<p>${n.title }</p>
+</c:forEach> --%>
+
+
+	<div class="card-body">
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title" style="font-weight: bold;">학사일정</h3>
+			</div>
+			<div id='calendar'></div>
+		</div>
+	</div>
+	<section class="content" style="padding-left: 10px; padding-right: 10px; padding-top: 10px;">
+		<div class="card">
+			<div class="card-header with-border" style="display: flex; height: 50px; padding-top: 0px;">
+				<div id="keyword" class="">
+					<h5 style="width: 100px; padding-top: 11px;">공지사항</h5>
+				</div>
+				<div class="input-group row " style="position: unset; padding-left: 550px; padding-bottom: 7px; font-size: 14px; padding-top: 5px;">
+					<!-- search bar -->
+
+
+					<!-- search bar -->
+					<select class="form-control col-md-3" name="searchType" id="searchType" style="font-size: 14px;">
+						<option value="" ${cri.searchType eq '' ? 'selected':''}>구분</option>
+						<option value="title" ${cri.searchType eq 'title' ? 'selected':''}>제목</option>
+						<option value="con" ${cri.searchType eq 'con' ? 'selected':''}>내용</option>
+						<option value="name" ${cri.searchType eq 'name' ? 'selected':''}>작성자</option>
+					</select>
+					<!-- keyword -->
+					<input class="form-control" type="text" name="keyword" placeholder="검색어를 입력하세요." value="${cri.keyword }" style="font-size: 14px;" />
+					<span class="input-group-append">
+						<button class="btn btn-primary" type="button" id="searchBtn" data-card-widget="search" onclick="list_go(1);">
+							<i class="fa fa-fw fa-search"></i>
+						</button>
+					</span>
+					<!-- end : search bar -->
+				</div>
+			</div>
+			<div class="card-body" style="text-align: center; padding-bottom: 0; padding-top: 7px;">
+				<div class="row">
+
+					<div class="col-sm-12" style="">
+						<table class="table table-hover table-sm" style="font-size: 15px;">
+							<tr style="height: 40px;">
+								<th>NO</th>
+								<th>제목</th>
+								<th>조회수</th>
+								<th>등록일</th>
+								<th>작성자</th>
+								<th>대상</th>
+							</tr>
+
+							<c:forEach items="${YList }" var="y">
+								<tr onclick="">
+									<td></td>
+									<td>${y.title }</td>
+									<td>${y.count }</td>
+									<td>${y.regist_date }</td>
+									<td>${y.name }</td>
+									<td>${y.target }</td>
+								</tr>
+							</c:forEach>
+							<c:forEach items="${noticeList }" var="n">
+								<tr onclick="">
+									<td>${n.num }</td>
+									<td>${n.title }</td>
+									<td>${n.count }</td>
+									<td>${n.regist_date }</td>
+									<td>${n.name }</td>
+									<td>${n.target }</td>
+								</tr>
+							</c:forEach>
+
+
+						</table>
+					</div>
+					<!-- col-sm-12 -->
+				</div>
+				<!-- row -->
+				<div style="padding-bottom: 18px;">
+					<%@ include file="/WEB-INF/views/common/pagination.jsp"%>
+				</div>
+			</div>
+			<!-- card-body -->
+		</div>
+	</section>
+
+</body>

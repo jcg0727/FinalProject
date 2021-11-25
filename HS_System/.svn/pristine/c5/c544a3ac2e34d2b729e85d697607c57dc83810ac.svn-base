@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Notice-Mapper">
+
+	<sql id="search">	
+		<if test="searchType == 'title'.toString()">
+			and A.title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'con'.toString()">
+			and A.content like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'name'.toString()">
+			and B.name like '%'||#{keyword}||'%'
+		</if>	
+		<if test="searchType2 != null and searchType2 != ''">
+			and A.target=#{searchType2}			
+		</if>	
+	</sql>	
+
+
+	<select id="selectNoticeY" resultType="notice">
+		select 
+		notice_no, title, content, count, regist_date, importance,target,name
+		from(
+		select row_number() over(order by A.regist_date desc)as num,
+		A.notice_no, A.title, A.content, A.count, A.regist_date, A.importance,A.target,B.name
+		from notice A, account B  
+		where A.account_no=B.account_no
+		and A.importance='Y'
+		order by A.regist_date desc, A.title asc
+		)
+		<![CDATA[where rownum <= 2]]>
+	</select>
+	
+	<select id="selectNoticeN" resultType="notice">
+		select row_number() over(order by A.regist_date desc)as num,
+		A.notice_no, A.title, A.content, A.count, A.regist_date, A.importance,A.target,B.name
+		from notice A, account B  
+		where A.account_no=B.account_no		
+		order by A.regist_date desc
+	</select>
+	
+	<select id="selectNoticeNSearch" resultType="notice">
+		select row_number() over(order by A.regist_date asc)as num,
+		A.notice_no, A.title, A.content, A.count, A.regist_date, A.importance,A.target,B.name
+		from notice A, account B  
+		where A.account_no=B.account_no
+		<include refid="search" />
+		order by A.regist_date desc
+	</select>
+	
+	<select id="selectNoticeNSearchCount" resultType="int">
+		select count(*)
+		from notice A, account B  
+		where A.account_no=B.account_no
+		<include refid="search" />
+		order by A.regist_date desc
+	</select>
+	
+	<select id="selectNotice_no" resultType="str">
+		select replace(('NO'||to_char(sysdate,'yyMMdd')||to_char(notice_seq.nextval,'0000')),' ','') from dual
+	</select>
+		
+	<insert id="insertNotice" parameterType="notice">
+		insert into notice (notice_no, title, content, regist_date, importance, account_no, target) 
+		values (#{notice_no}, #{title}, #{content}, sysdate, #{importance}, #{account_no}, #{target} )
+	</insert>
+	
+	<insert id="insertAttach">
+		insert into notice_attach(notice_no,attach_order,attach_no)
+		values(#{notice_no},#{attach_order},#{attach_no})
+	</insert>
+	
+	<select id="selectAllByNotice_no" resultType="notice">
+		select * from notice where notice_no=#{notice_no}
+	</select>
+	
+	<select id="selectAttach_noByNotice_no" resultType="notice">
+		select attach_no from notice_attach where notice_no=#{notice_no}
+	</select>
+	
+	<update id="increaseViewCnt">
+		update notice 
+		set 
+		count=count+1 
+		where notice_no=#{notice_no}
+	</update>
+	
+	<update id="updateNotice" parameterType="notice">
+		update notice set title=#{title},
+		content=#{content},
+		importance=#{importance},
+		target=#{target}
+		where notice_no=#{notice_no}
+	</update>
+	
+	<delete id="deleteNotice_attach">
+		delete from notice_attach where attach_no=#{attach_no}
+	</delete>
+	
+	<delete id="deleteNotice">
+		delete from notice where notice_no=#{notice_no}
+	</delete>
+
+</mapper>

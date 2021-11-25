@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Counsel2-Mapper">
+
+	<sql id="search">	
+		<if test="cri.searchType != null and cri.searchType != ''">
+			and A.consl_categ_nm=#{cri.searchType}			
+		</if>	
+		<if test="cri.searchType2 != null and cri.searchType2 != ''">
+			and B.status_nm=#{cri.searchType2}			
+		</if>	
+	</sql>	
+
+
+	<sql id="search2">	
+		<if test="cri.searchType == 'student_no'.toString()">
+			and A.student_no like '%'||#{cri.keyword}||'%'			
+		</if>
+		<if test="cri.searchType == 'name'.toString()">
+			and C.name like '%'||#{cri.keyword}||'%'
+		</if>		
+		<if test="cri.searchType2 != null and cri.searchType2 != ''">
+			and A.consl_categ_nm=#{cri.searchType2}			
+		</if>	
+		<if test="cri.searchType3 != null and cri.searchType3 != ''">
+			and B.status_nm=#{cri.searchType3}			
+		</if>	
+	</sql>	
+
+	<select id="selectAllByStudent_no" resultType="counsel2">
+		select 
+		row_number() over(order by A.counsel_date asc)as num,
+		A.counsel_no, A.register_content, A.refuse_content, B.status_nm, A.consl_categ_cd, 
+		A.student_no, C.name, A.counsel_date, A.counsel_content, A.consl_categ_nm, A.regist_title 
+		from counsel A, common_code_detail B, account C, professor D
+		where student_no=#{student_no}
+		and A.status_cd = B.status_cd
+		and C.account_no=D.account_no
+		and A.pro_no=D.pro_no
+		order by A.counsel_date desc
+	</select>
+
+	<select id="selectAllByStudent_noSearch" resultType="counsel2">
+		select 
+		row_number() over(order by A.counsel_date asc)as num,
+		A.counsel_no, A.register_content, A.refuse_content, B.status_nm, A.consl_categ_cd, 
+		A.student_no, C.name, A.counsel_date, A.counsel_content, A.consl_categ_nm, A.regist_title 
+		from counsel A, common_code_detail B, account C, professor D
+		where student_no=#{student_no}
+		and A.status_cd = B.status_cd
+		and C.account_no=D.account_no
+		and A.pro_no=D.pro_no
+		<include refid="search" />
+		order by A.counsel_date desc
+	</select>
+	
+	<select id="selectAllByStudent_noCount" resultType="int">
+		select 
+		count(*)
+		from counsel A, common_code_detail B, account C, professor D
+		where student_no=#{student_no}
+		and A.status_cd = B.status_cd
+		and C.account_no=D.account_no
+		and A.pro_no=D.pro_no
+		<include refid="search" />
+		order by A.counsel_date desc
+	</select>
+	
+	<select id="selectCounsel_no" resultType="str">
+		select replace(('CN'||to_char(sysdate,'yyMMdd')||to_char(counsel_seq.nextval,'0000')),' ','') from dual
+	</select>
+	
+	<insert id="insertCounsel">
+			insert into counsel
+		(
+			counsel_no,
+			register_content,
+			status_cd,
+			consl_categ_cd,
+			student_no,
+			pro_no,
+			counsel_date,
+			consl_categ_nm,
+			regist_title
+		) values(
+			#{counsel_no},
+			#{register_content},
+			'CCDE003',
+			#{consl_categ_cd},
+			#{student_no},
+			#{pro_no},
+			#{counsel_date},
+			#{consl_categ_nm},
+			#{regist_title}
+		)
+	</insert>
+	
+	
+	<select id="selectAllByPro_no" resultType="counsel2">
+		select
+		A.counsel_no, A.register_content, A.regist_title, A.refuse_content, B.status_nm, A.consl_categ_cd, 
+		A.student_no, C.name, A.counsel_date, A.counsel_content, A.consl_categ_nm 
+		from counsel A, common_code_detail B, account C, student D
+		where A.pro_no=#{pro_no}
+		and A.status_cd = B.status_cd
+		and C.account_no=D.account_no
+		and A.student_no=D.student_no
+		order by A.counsel_date desc
+	</select>
+	
+	<select id="selectAllByPro_noSearch" resultType="counsel2">
+		select
+		A.counsel_no, A.register_content, A.regist_title, A.refuse_content, B.status_nm, A.consl_categ_cd, 
+		A.student_no, C.name, A.counsel_date, A.counsel_content, A.consl_categ_nm 
+		from counsel A, common_code_detail B, account C, student D
+		where A.pro_no=#{pro_no}
+		and A.status_cd = B.status_cd
+		and C.account_no=D.account_no
+		and A.student_no=D.student_no
+		<include refid="search2" />
+		order by A.counsel_date desc
+	</select>
+
+	<select id="selectAllByPro_noCount" resultType="int">
+		select
+		count(*)
+		from counsel A, common_code_detail B, account C, student D
+		where A.pro_no=#{pro_no}
+		and A.status_cd = B.status_cd
+		and C.account_no=D.account_no
+		and A.student_no=D.student_no
+		<include refid="search2" />
+		order by A.counsel_date desc
+	</select>
+	
+	<update id="updateAccept">
+		update counsel set status_cd='CCDE001' where counsel_no=#{counsel_no}
+	</update>
+
+	<update id="updateDeny">
+		update counsel set status_cd='CCDE002' where counsel_no=#{counsel_no}
+	</update>
+	
+	<update id="updateRefuse_content">
+		update counsel set refuse_content=#{refuse_content} where counsel_no=#{counsel_no}
+	</update>
+	
+	<select id="selectAccount_noByStudent_no" resultType="str">
+		select account_no from student where student_no=#{student_no}
+	</select>
+	
+	<select id="selectDetailByCounsel_no" resultType="counsel2">
+		select register_content, refuse_content from counsel where counsel_no=#{counsel_no}
+	</select>
+	
+	
+</mapper>

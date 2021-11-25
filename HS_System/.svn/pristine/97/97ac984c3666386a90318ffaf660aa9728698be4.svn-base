@@ -1,0 +1,165 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<%@ page trimDirectiveWhitespaces ="true"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<head>
+<style>
+.table td, .table th {
+	border-top: none;
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+}
+.timeTable{
+	height: 950px;
+}
+.timeTable_td{
+	width : 120px;
+	font-weight:bold;
+}
+td {
+	padding : 12px;
+	text-align:center;
+}
+.timeTable_time{
+	margin : auto;
+	width : 140px;
+	text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card card-outline" style="margin:15px; height: auto;">
+
+	<div class="card-header" style="text-align:center;">
+		<input type="text" value="시간표" style="border:0; font-size:25px; text-align:center; font-weight:bold;">
+	</div> <!-- card-header-->
+	
+	<div class="card-body">
+	
+			<table class="table table-bordered timeTable">
+				<thead>
+					<tr style="text-align:center;">
+						<th style="">/</th>
+						<th id="mon">월</th>
+						<th id="tue">화</th>
+						<th id="wed">수</th>
+						<th id="thur">목</th>
+						<th id="fri">금</th>
+					</tr>
+				</thead>
+				<tbody style="text-align:center;">
+					<tr class="CT01">
+						 <td class="timeTable_td">1교시<br>9 : 00</td>	
+						 <td style="background-color: #ECC3B8">1</td>	
+						 <td>1</td>	
+						 <td>1</td>	
+						 <td>1</td>	
+						 <td>1</td>	
+					</tr>
+					<tr class="CT02">
+						 <td class="timeTable_td">2교시<br>10 : 00</td>	
+						 <td style="background-color: #ECC3B8; border-top-color: none;">2</td>
+						 <td>2</td>	
+						 <td>2</td>	
+						 <td>2</td>	
+						 <td>2</td>	
+					</tr>
+					<tr class="CT03">
+						 <td class="timeTable_td">3교시<br>11 : 00</td>	
+						 <td>3</td>	
+						 <td>3</td>	
+						 <td>3</td>	
+						 <td>3</td>	
+						 <td>3</td>	
+					</tr>
+					<tr class="CT04">
+						 <td class="timeTable_td">4교시<br>12 : 00</td>	
+						 <td>4</td>	
+						 <td>4</td>	
+						 <td>4</td>	
+						 <td>4</td>	
+						 <td>4</td>	
+					</tr>
+					<tr class="CT05">
+						 <td class="timeTable_td">5교시<br>13 : 00</td>	
+						 <td>5</td>	
+						 <td>5</td>	
+						 <td>5</td>	
+						 <td>5</td>	
+						 <td>5</td>								
+					</tr >
+					<tr class="CT06">
+						 <td class="timeTable_td">6교시<br>14 : 00</td>	
+						 <td>6</td>	
+						 <td>6</td>	
+						 <td>6</td>	
+						 <td>6</td>	
+						 <td>6</td>	
+					</tr>
+					<tr class="CT07">
+						 <td class="timeTable_td">7교시<br>15 : 00</td>	
+						 <td>7</td>	
+						 <td>7</td>	
+						 <td>7</td>	
+						 <td>7</td>	
+						 <td>7</td>	
+					</tr>
+					<tr class="CT08">
+						 <td class="timeTable_td">8교시<br>16 : 00</td>	
+						 <td>8</td>	
+						 <td>8</td>	
+						 <td>8</td>	
+						 <td>8</td>	
+						 <td>8</td>	
+					</tr>
+					<tr class="CT09">
+						 <td class="timeTable_td" >9교시<br>17 : 00</td>	
+						 <td>9</td>	
+						 <td>9</td>	
+						 <td>9</td>	
+						 <td>9</td>	
+						 <td>9</td>								
+					</tr>										
+				</tbody>
+			</table>
+
+		</div> <!-- card-body -->
+
+</div> <!-- card card-outline -->
+
+<script>
+function selectTimeTable(){
+	  $.ajax({
+			url : '<%=request.getContextPath()%>/sugang/list_search',
+			data : JSON.stringify(data),
+			contentType : "application/json; charset=UTF-8",
+			type : 'post',
+			dataType : "json",
+			success : function(data) {
+				printData(data.lectureList, '.gaesul_total_table','#gaesul_total_list', '.gaesul_total_body');
+				printPagination(data.pageMaker, '.gaesul_total_table-footer','#gaesulTotal-pagination-template', '.pagination');
+				boguanList();
+				sugangApplySuccessList();	
+			},
+			error : function(error) {
+				console.log(error);
+			}
+
+		});
+}
+
+</script>
+
+
+
+
+
+
+
+</body>

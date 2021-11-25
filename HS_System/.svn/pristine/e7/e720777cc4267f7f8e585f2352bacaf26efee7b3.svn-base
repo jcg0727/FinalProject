@@ -1,0 +1,66 @@
+package kr.ac.hs.dao.grades;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.SqlSession;
+
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.dto.grades.GradesVO;
+
+public class GradesDAOImpl implements GradesDAO{
+	
+	private SqlSession session;
+	
+	public void setSqlSession(SqlSession session) {
+		this.session = session;
+	}
+
+	@Override
+	public List<GradesVO> selectGradesByStudentNo(String student_no) throws SQLException {
+		List<GradesVO> gradesList = session.selectList("Grades-Mapper.selectGradesByStudentNo", student_no);
+		return gradesList;
+	}
+	
+	@Override
+	public double selectPreviousSemesterGradesByStudnetNo(String student_no) throws SQLException{
+		double score = session.selectOne("Grades-Mapper.selectPreviousSemesterGradesByStudnetNo", student_no);
+		return score;
+	}
+
+	@Override
+	public List<GradesVO> selectThisSemesterGradesByStudentNo(GradesVO grades, SearchCriteria cri) throws SQLException {
+		int offset = cri.getStartRowNum();
+		int limit = cri.getPerPageNum();
+		RowBounds rowBounds = new RowBounds(offset, limit);
+		
+		List<GradesVO> gradesList = session.selectList("Grades-Mapper.selectThisSemesterGradesByStudentNo", grades, rowBounds);
+		return gradesList;
+	}
+
+	@Override
+	public List<GradesVO> selectGradesBySemester(GradesVO grades,SearchCriteria cri) throws SQLException {
+		int offset = cri.getStartRowNum();
+		int limit = cri.getPerPageNum();
+		RowBounds rowBounds = new RowBounds(offset, limit);
+		
+		List<GradesVO> gradesList = session.selectList("Grades-Mapper.selectGradesBySemester", grades, rowBounds);
+		
+		return gradesList;
+	}
+
+	@Override
+	public GradesVO selectTotalGradesByStudentNo(String student_no) throws SQLException {
+		GradesVO grades = session.selectOne("Grades-Mapper.selectTotalGradesByStudentNo", student_no);
+		return grades;
+	}
+
+	@Override
+	public List<String> selectSemesterListByStudentNo(String student_no) throws SQLException {
+		List<String> semesterList = session.selectList("Grades-Mapper.selectSemesterListByStudentNo", student_no);
+		return semesterList;
+	}
+	
+
+}

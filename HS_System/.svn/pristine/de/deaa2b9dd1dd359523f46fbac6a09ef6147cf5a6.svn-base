@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- account 사진업로드 -->
+	<bean id="picturePath" class="java.lang.String">
+		<constructor-arg value="${account.picture.upload}" />
+	</bean>
+
+
+	<!-- filePath -->
+	<bean id="uploadFile" class="java.lang.String">
+		<constructor-arg value="${regist.uploadFile}" />
+	</bean>
+
+
+	<!-- DAO -->
+	<bean id="departmentChangeDAO"
+		class="kr.ac.hs.dao.academic.DepartmentChangDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="departmentDAO" class="kr.ac.hs.dao.DepartmentDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="menuDAO" class="kr.ac.hs.dao.common.MenuDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="studentDAO" class="kr.ac.hs.dao.StudentDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="professorDAO"
+		class="kr.ac.hs.dao.common.ProfessorDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="staffDAO" class="kr.ac.hs.dao.StaffDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="accountDAO" class="kr.ac.hs.dao.AccountDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="calendarDAO"
+		class="kr.ac.hs.dao.AcademicCalendarDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="attachDAO" class="kr.ac.hs.dao.common.AttachmentDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="pluralDAO"
+		class="kr.ac.hs.dao.academic.PluralMajorDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="staffAcademicStateDAO"
+		class="kr.ac.hs.dao.academic.StaffAcademicStateDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="sugangApplyDAO"
+		class="kr.ac.hs.dao.sugang.SugangApplyDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="lectureTimeDAO"
+		class="kr.ac.hs.dao.lecture.LectureTimeDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="gradesDAO" class="kr.ac.hs.dao.grades.GradesDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="curriculumDAO"
+		class="kr.ac.hs.dao.lecture.CurriculumDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="lectureManagementProfDAO"
+		class="kr.ac.hs.dao.lecture.LectureManagementProfDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="LectureStdDAO"
+		class="kr.ac.hs.dao.lecture.LectureStdDAOImpl"
+		p:session-ref="sqlSession" />
+	<bean id= "attendanceDAO"
+		class="kr.ac.hs.dao.attendance.AttendanceDAOImpl"
+		p:sqlSession-ref="sqlSession" />		
+
+
+	<!-- 강의계획DAO -->
+	<bean id="lecturePlanDAO" class="kr.ac.hs.dao.LecturePlanDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="academicStateDAO"
+		class="kr.ac.hs.dao.AcademicStateDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="counselDAO" class="kr.ac.hs.dao.common.CounselDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="staffApplicantDAO"
+		class="kr.ac.hs.dao.applicant.StaffApplicantDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+
+
+	<!-- 장학 -->
+	<bean id="scholarDAO" class="kr.ac.hs.dao.scholar.ScholarDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+
+	<bean id="scholarService"
+		class="kr.ac.hs.service.scholar.ScholarServiceImpl"
+		p:scholarDAO-ref="scholarDAO" />
+
+	<!-- service -->
+	<bean id="staffAcademicStatdService"
+		class="kr.ac.hs.service.academic.StaffAcademicStateServiceImpl"
+		p:staffAcademicStateDAO-ref="staffAcademicStateDAO" />
+
+	<bean id="departmentChangeService"
+		class="kr.ac.hs.service.academic.DepartmentChangeServiceImpl"
+		p:departmentChageDAO-ref="departmentChangeDAO"
+		p:counselDAO-ref="counselDAO" p:studentDAO-ref="studentDAO"
+		p:departmentDAO-ref="departmentDAO" p:professorDAO-ref="professorDAO"
+		p:gradesDAO-ref="gradesDAO" />
+
+	<bean id="departmentService"
+		class="kr.ac.hs.service.DepartmentServiceImpl"
+		p:departmentDAO-ref="departmentDAO" />
+	<bean id="menuService"
+		class="kr.ac.hs.service.common.MenuServiceImpl"
+		p:menuDAO-ref="menuDAO" />
+	<bean id="accountService"
+		class="kr.ac.hs.service.AccountServiceImpl"
+		p:accountDAO-ref="accountDAO" />
+	<bean id="searchService"
+		class="kr.ac.hs.service.common.SearchServiceImpl"
+		p:departmentDAO-ref="departmentDAO" />
+	<bean id="smsService" class="kr.ac.hs.service.SmsServiceImpl" />
+	<bean id="curriculumService"
+		class="kr.ac.hs.service.lecture.CurriculumServiceImpl"
+		p:curriculumDAO-ref="curriculumDAO"
+		p:departmentDAO-ref="departmentDAO" />
+
+
+	<bean id="calendarService"
+		class="kr.ac.hs.service.AcademicCalendarServiceImpl"
+		p:academicCalenderDAO-ref="calendarDAO" />
+	<bean id="pluralMajorService"
+		class="kr.ac.hs.service.academic.PluralMajorSerivceImpl"
+		p:pluralMajorDAO-ref="pluralDAO" p:counselDAO-ref="counselDAO"
+		p:studentDAO-ref="studentDAO" p:departmentDAO-ref="departmentDAO" />
+
+	<bean id="studentService"
+		class="kr.ac.hs.service.StudentServiceImpl"
+		p:studentDAO-ref="studentDAO"
+		p:academicFreshmenDAO-ref="academicFreshmenDAO" />
+	<bean id="staffService" class="kr.ac.hs.service.StaffServiceImpl"
+		p:staffDAO-ref="staffDAO" />
+	<bean id="professorService"
+		class="kr.ac.hs.service.common.ProfessorServiceImpl"
+		p:professorDAO-ref="professorDAO" />
+
+	<bean id="counselService"
+		class="kr.ac.hs.service.common.CounselServiceImpl"
+		p:counselDAO-ref="counselDAO" />
+
+	<bean id="lectureTimeService"
+		class="kr.ac.hs.service.lecture.LectureTimeServiceImpl"
+		p:lectureTimeDAO-ref="lectureTimeDAO" />
+
+	<!-- 강의계획Service -->
+	<bean id="lecturePlanService"
+		class="kr.ac.hs.service.LecturePlanServiceImpl"
+		p:lecturePlanDAO-ref="lecturePlanDAO" />
+
+	<bean id="lectureManagementProfService"
+		class="kr.ac.hs.service.lecture.LectureManagementProfServiceImpl"
+		p:lectureManagementProfDAO-ref="lectureManagementProfDAO" />
+
+	<!-- 학적상태변경(휴/복/자) Service -->
+	<bean id="AcademicStateService"
+		class="kr.ac.hs.service.AcademicStateServiceImpl"
+		p:academicStateDAO-ref="academicStateDAO" />
+
+	<bean id="attachmentService"
+		class="kr.ac.hs.service.common.AttachmentServiceImpl"
+		p:attachmentDAO-ref="attachDAO" />
+
+	<bean id="staffApplicantService"
+		class="kr.ac.hs.service.applicant.StaffApplicantServiceImpl"
+		p:staffApplicantDAO-ref="staffApplicantDAO" />
+
+	<bean id="studentInformationDAO"
+		class="kr.ac.hs.dao.academic.StudentInformationDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="studentInformationService"
+		class="kr.ac.hs.service.academic.StudentInformationServiceImpl"
+		p:studentInformationDAO-ref="studentInformationDAO" />
+
+	<bean id="academicFreshmenDAO"
+		class="kr.ac.hs.dao.AcademicFreshmenDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="academicFreshmenService"
+		class="kr.ac.hs.service.AcademicFreshmenServiceImpl"
+		p:academicFreshmenDAO-ref="academicFreshmenDAO" />
+
+	<bean id="exSugangListDAO"
+		class="kr.ac.hs.dao.sugang.ExSugangListDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="exSugangListService"
+		class="kr.ac.hs.service.sugang.ExSugangListServiceImpl"
+		p:exSugangListDAO-ref="exSugangListDAO" />
+
+	<bean id="sugangApplyService"
+		class="kr.ac.hs.service.sugang.SugangApplyServiceImpl"
+		p:sugangApplyDAO-ref="sugangApplyDAO" />
+
+	<bean id="graduationDAO"
+		class="kr.ac.hs.dao.graduation.GraduationDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="graduationService"
+		class="kr.ac.hs.service.graduation.GraduationServiceImpl"
+		p:graduationDAO-ref="graduationDAO" />
+
+	<bean id="gradesService"
+		class="kr.ac.hs.service.grades.GradesServiceImpl"
+		p:gradesDAO-ref="gradesDAO" />
+
+	<bean id="LectureStdService"
+		class="kr.ac.hs.service.lecture.LectureStdServiceImpl"
+		p:lecDAO-ref="LectureStdDAO" />
+
+	<bean id="announceDAO" class="kr.ac.hs.dao.common.AnnounceDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="announceService"
+		class="kr.ac.hs.service.common.AnnounceServiceImpl"
+		p:announceDAO-ref="announceDAO" />
+
+	<bean id="noticeDAO" class="kr.ac.hs.dao.notice.NoticeDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="noticeService"
+		class="kr.ac.hs.service.notice.NoticeServiceImpl"
+		p:noticeDAO-ref="noticeDAO" />
+		
+	<bean id="attendanceService"
+		class="kr.ac.hs.service.attendance.AttendanceServiceImpl"
+		p:attendanceDAO-ref="attendanceDAO" />		
+
+
+</beans>
+

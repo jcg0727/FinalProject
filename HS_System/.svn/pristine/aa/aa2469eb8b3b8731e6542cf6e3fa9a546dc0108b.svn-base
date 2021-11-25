@@ -1,0 +1,133 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<style>
+#chart-body{
+   height: 100%;
+}
+.chart-div {
+	margin: 0px auto;
+	width: 100%;
+	height: 50%;
+	text-align: center;
+}
+
+.chart-body:first-child{
+   margin-bottom: 20px;
+}
+
+.chart-div .col-12{
+   height: 100%;  
+}
+</style>
+
+<div id="chart-body">
+   <div class="row chart-div">
+      <div class="col-4">
+         <label for="#thisweek">저번주 출석 현황</label>
+         <canvas id="thisweek"></canvas>
+      </div>
+      <div class="col-4">
+         <label for="#lastweek">이번주 출석 현황</label>
+         <canvas id="lastweek"></canvas>
+      </div>
+      <div class="col-4">
+         <label for="#thisSemester">이번학기 출석 현황</label>
+         <canvas id="thisSemester"></canvas>
+      </div>
+   </div>
+   <div class="row chart-div">
+      <div class="col-12">
+         <label for="#test">뭐넣지</label>
+         <canvas id="test"></canvas>
+      </div>
+   </div>
+</div>
+<script>
+var target = "";
+var dataset = "";
+var ctx = "";
+var myChart = "";
+var data = ""
+
+function getAttendanceStatus(){
+	
+	data = {'class_no' : '${class_no}' , 'lecture_semester' : '202102'};
+	console.log(data);
+	
+	$.ajax({
+		url : '<%=request.getContextPath()%>/professor/attendanceStatus',
+		data : JSON.stringify(data),
+		contentType : "application/json; charset=UTF-8",
+		success : function(data){
+			console.log(data);
+			var total = parseInt(data.thisSemester.totalCount);
+			var today = parseInt(data.thisSemester.todayCount);
+			var atten = parseInt(data.thisSemester.attenCount);
+			var tardy = parseInt(data.thisSemester.tardyCount);
+			
+			var arr = [
+				parseInt(data.thisSemester.todayCount)-parseInt(data.thisSemester.attenCount), 
+				parseInt(data.thisSemester.attenCount)-parseInt(data.thisSemester.tardyCount), parseInt(data.thisSemester.tardyCount)
+				];
+			
+			printChart(data, '이번학기 출석현황', 'thisSemester', 'doughnut');
+		},
+		error : function(error){
+			
+		}
+	});	
+};
+
+function drawChart(){
+   var data = [100,200,300];
+   getAttendanceStatus();
+   printChart(data, '저번주 출석현황', 'thisweek', 'doughnut');
+   printChart(data, '이번주 출석현황', 'lastweek', 'doughnut');
+   
+   printChart(data, '뭐넣지', 'test', 'bar');
+   
+};
+
+
+function printChart(data, label, target,type){
+   dataset = {
+        labels: [
+          '결석',
+          '출결',
+          '지각'
+        ],
+        datasets: [{
+          label: label,
+          data: data,
+          backgroundColor: [
+            'rgb(255, 99, 132)',
+            'rgb(54, 162, 235)',
+            'rgb(255, 205, 86)'
+          ],
+          hoverOffset: 4
+        }],
+        maintainAspectRatio : false
+      };
+   
+   ctx = document.getElementById(target).getContext('2d');
+
+   myChart = new Chart(ctx, {
+      type : type,
+      data : dataset,
+      options : {
+    	  animation : {
+    		  delay : 1500
+    	  },
+    	  plugins: {
+              legend: {
+                  display: true,
+                  labels: {
+                	  boxWidth : 20
+                  }
+              }
+          }
+      }
+   });
+};
+
+</script>

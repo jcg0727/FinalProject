@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="lectureManagementProf-Mapper">
+
+<select id="selectLectureList_prof" resultType="lectureManagemenProf">
+	SELECT *
+    from
+    (
+	SELECT DISTINCT
+	A.CLASS_NO as class_no, 
+	A.CLASS_NAME as class_name,
+	A.CLASS_GRADE as class_grade, 
+    C.WEEK_1 as class_content,
+    A.CLASS_TYPE as class_type,
+    
+	listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ',') 
+	within group(order by b.day desc)
+	over(partition by a.class_no) as class_day,
+	
+	(select count(*)	
+	from lecture_register
+	WHERE LECTURE_SEMESTER = '202201'
+	<!-- AND STATUS_CD='CCDN001' -->
+	AND CLASS_NO = A.CLASS_NO) AS class_apply
+	
+	FROM LECTURE A, LECTURE_TIMETABLE B, LECTURE_PLAN C
+	WHERE a.pro_no = #{pro_no}
+	AND A.lecture_semester = '202201'
+	AND a.lecture_semester = b.lecture_semester
+	AND a.class_no = b.class_no
+    AND a.lecture_semester = c.lecture_semester
+    AND a.class_no = c.class_no
+ 	order by a.class_no
+    )
+    WHERE rownum between 1 and 6
+</select>
+
+<select id="selectLectureDetailProfByClassNo" resultType="lectureManagemenProf">
+
+    SELECT *
+    from
+    (
+	SELECT DISTINCT
+	A.CLASS_NO as class_no, 
+	A.CLASS_NAME as class_name,
+	A.CLASS_GRADE as class_grade, 
+    C.WEEK_1 as class_content,
+    A.CLASS_TYPE AS class_type,
+	
+	listagg(b.day||substr(class_timec_start_cd,4)||substr(class_timec_end_cd,4), ',') 
+	within group(order by b.day desc)
+	over(partition by a.class_no) as class_day,
+	
+	(select count(*)
+	from lecture_register
+	WHERE LECTURE_SEMESTER = '202102'
+	AND STATUS_CD='CCDN001'
+	AND CLASS_NO = A.CLASS_NO) as class_apply
+	
+	FROM LECTURE A, LECTURE_TIMETABLE B, LECTURE_PLAN C
+	WHERE a.pro_no = #{pro_no}
+	AND a.lecture_semester = b.lecture_semester
+	AND A.lecture_semester = '202102'
+	AND a.class_no = b.class_no
+    AND a.lecture_semester = c.lecture_semester
+    AND a.class_no = c.class_no
+    AND a.class_no=#{class_no}
+    )
+    WHERE rownum between 1 and 6
+
+</select>
+
+<select id="selectLectureStudentList" resultType="lectureStudentList">
+
+	select b.class_no, b.student_no, d.dept_nm, e.name as student_name,
+		(
+		select count(*)
+		from attendance
+		where student_no = c.student_no
+		and class_no = #{class_no}
+		and TO_CHAR(ATTEND_DATE,'YYMMDD') = TO_CHAR(sysdate,'YYMMDD')
+		) as attendanceStatus
+		
+			
+	from lecture a, lecture_register b, student c, department d, account e
+	where a.class_no = b.class_no
+	and a.lecture_semester = b.lecture_semester
+	and a.lecture_semester = '202102'
+	and a.pro_no = #{pro_no}                       
+	and b.status_cd = 'CCDN001'
+	and a.class_no = #{class_no}                       
+	and b.student_no = c.student_no
+	and c.dept_cd = d.dept_cd
+	and c.account_no = e.account_no
+
+</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

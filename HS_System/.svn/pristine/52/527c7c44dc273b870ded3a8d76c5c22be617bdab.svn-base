@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LectureStu-Mapper">
+<!-- 	<sql id="search"> -->
+<!-- 		<if test="searchType == 'gb'.toString()"> -->
+<!-- 			and( b.student_no like '%'||#{keyword}||'%' -->
+<!-- 			or a.name like -->
+<!-- 			'%'||#{keyword}||'%' or c.dept_nm like '%'||#{keyword}||'%') -->
+<!-- 		</if> -->
+<!-- 		<if test="searchType == 'nm'.toString()"> -->
+<!-- 			and a.name like '%'||#{keyword}||'%' -->
+<!-- 		</if> -->
+<!-- 		<if test="searchType == 'nb'.toString()"> -->
+<!-- 			and b.student_no like '%'||#{keyword}||'%' -->
+<!-- 		</if> -->
+<!-- 		<if test="searchType == 'dt'.toString()"> -->
+<!-- 			and c.dept_nm like '%'||#{keyword}||'%' -->
+<!-- 		</if> -->
+<!-- 	</sql> -->
+
+
+	<select id="lectureStuBasicList" resultType="lecture">
+		<include refid="Common-Mapper.PageHeader" />
+		SELECT
+		a.student_no,
+		a.lecture_semester,
+		a.class_no,
+		b.class_name,
+		b.class_grade,
+		b.class_type,
+		d.name
+		FROM
+		lecture_register a,
+		lecture b,
+		professor c,
+		account d
+		WHERE
+		a.class_no = b.class_no
+		AND
+		b.pro_no =
+		c.pro_no
+		AND
+		c.account_no = d.account_no
+		AND a.student_no =
+		#{student_no}
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+
+
+
+
+
+</mapper>

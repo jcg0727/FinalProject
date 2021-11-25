@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Counsel-Mapper">
+	<update id="insertCounsel">
+		insert into counsel
+		(
+			counsel_no,
+			register_content,
+			status_cd,
+			consl_categ_cd,
+			student_no,
+			pro_no,
+			counsel_date,
+			consl_categ_nm
+		) values(
+			#{counsel_no},
+			#{register_content},
+			'CCDE003',
+			#{consl_categ_cd},
+			#{student_no},
+			#{pro_no},
+			#{counsel_date},
+			#{consl_categ_nm}
+		)
+	</update>
+
+	<select id="selectCounselSequence" resultType="String">
+		select replace('CN'||to_char(sysdate, 'yymmdd')||to_char(counsel_seq.nextval,'0000'),' ', '') from dual
+	</select>
+	
+	<select id="selectCounselByCounselNo" resultType="counselSelect">
+		SELECT
+		    counsel_no,
+		    register_content,
+		    refuse_content,
+		    status_cd,
+		    consl_categ_cd,
+		    student_no,
+		    pro_no,
+	   		to_char(counsel_date, 'yyyy/MM/dd HH24:mi') as counsel_date,
+	    	counsel_content 
+    	from counsel where 1=1 and counsel_no = #{counsel_no}
+	</select>
+	
+	<select id="selectCounselListByProffesorNo" resultType="counsel">
+		select * from counsel where 1=1 and pro_no = #{pro_no}
+	</select>
+	
+	<update id="deleteCounselByCounselNo">
+		delete from counsel where counsel_no =#{counsel_no}
+	</update>
+	
+	<select id="selectProfessorClassTimeTable" resultType="counselLecture">
+	<![CDATA[
+		select
+		t.class_no as classNo,t.class_name as className,
+		to_date(today||' '||(select to_char(start_time, 'hh24:mi:ss') from class_time where class_timec_cd = t.class_timec_start_cd),'yyyy-MM-dd hh24:mi:ss') as startTime,
+		to_date(today||' '||(select to_char(end_time, 'hh24:mi:ss') from class_time where class_timec_cd = t.class_timec_end_cd),'yyyy-MM-dd hh24:mi:ss') as endTime
+		from 
+		(
+		SELECT 
+		     b.class_no,b.class_name, a.today, b.day, class_timec_start_cd, b.class_timec_end_cd
+		FROM
+		      (
+		      SELECT  TO_CHAR (start_date + LEVEL - 1, 'YYYY-MM-DD') TODAY
+		             ,TO_CHAR(start_date + LEVEL - 1,'DY') DAYS_K
+		        FROM (SELECT start_date FROM academic_calendar WHERE status_cd = 'CCDX001' AND cal_semester = #{lectureSemester})
+		        CONNECT BY start_date + LEVEL - 1 <= (SELECT end_date FROM academic_calendar WHERE status_cd = 'CCDX001' AND cal_semester = #{lectureSemester})
+		        ) a,
+		        (
+		        select b.class_name, a.class_no, day, class_timec_start_cd, class_timec_end_cd
+		          from lecture_timetable a, lecture b 
+		         where a.lecture_semester = b.lecture_semester 
+		           and a.class_no = b.class_no
+		           and b.pro_no = #{proNo}
+		           and a.lecture_semester = #{lectureSemester}
+		           order by day
+		        ) b
+		where a.days_k = b.day
+		order by b.class_no, a.today, day
+		)t
+	]]>
+	</select>
+</mapper>

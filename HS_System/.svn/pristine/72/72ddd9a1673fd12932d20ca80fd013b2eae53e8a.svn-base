@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StaffCurriculum-Mapper">
+	<sql id="search">
+		<if test="cri.searchType == 'cno'.toString()">
+			and a.class_no like '%'||#{keyword}||'%'
+		</if>
+		<if test="cri.searchType == 'cnm'.toString()">
+			and a.class_nm like '%'||#{keyword}||'%'
+		</if>
+		<if test="cri.searchType == 'ctype'.toString()">
+			and a.class_type_cd like '%'||#{keyword}||'%'
+		</if>
+		
+		<if test="cri.searchType == 'cnoS'.toString()">
+			and class_no like '%'||#{keyword}||'%'
+		</if>
+		<if test="cri.searchType == 'cnmS'.toString()">
+			and class_nm like '%'||#{keyword}||'%'
+		</if>
+		<if test="cri.searchType == 'ctypeS'.toString()">
+			and class_type_cd like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+	
+	
+	<sql id="deptNm">
+		<if test="cri.searchType != null and cri.searchType!= ''">
+			and c.dept_nm = #{cri.searchType}
+		</if>
+	</sql>
+	
+	
+	
+	
+	<!--상세보기(공통)  -->
+	<select id="selectCurriculumDetail" resultType="curriculum">
+         select a.class_no, a.class_nm, a.class_score, 
+	            a.curri_content, a.delete_whether, a.grade, b.dept_nm, c.status_nm
+	       from curriculum a, department b, common_code_detail c
+	      where a.dept_cd = b.dept_cd and
+                a.class_type_cd = c.status_cd and
+	            a.class_no = #{class_no}
+    </select>           
+    
+	
+	<select id="selectCreateClass_No" resultType="str">
+		select 'CA0'||to_char(CURRICULUM_SEQ.NEXTVAL) from dual  
+	</select>
+	
+	<select id="selectCurriculumDeptStaff" resultType="curriculum">
+       select row_number() over(order by class_no)as no, a.class_no, a.class_nm,
+               a.class_score, a.curri_content, a.delete_whether, a.grade, a.class_type_cd, c.dept_nm, d.authority_cd
+		  from curriculum a, staff b, department c, account d
+ 		 where a.dept_cd = b.dept_cd and
+               a.dept_cd = c.dept_cd and
+               b.dept_cd = c.dept_cd and
+               b.account_no = d.account_no and
+               a.delete_whether = 'N' and
+               b.staff_no = #{staff_no}     
+       		   <include refid="search"/>
+	</select>
+
+	
+	<select id="selectCurriculumDeptStaffCount" resultType="int">
+		select count(*)
+		  from curriculum a, staff b
+		 where a.dept_cd = b.dept_cd and
+		 	   a.delete_whether = 'N' and
+		       b.staff_no = #{staff_no}      
+       		   <include refid="search"/>
+	</select>
+	
+	
+	<select id="selectCurriculumStaff" resultType="curriculum">
+		<include refid="Common-Mapper.PageHeader" />
+		select row_number() over(order by class_no desc)as no, a.class_no, a.class_nm,a.class_score, 
+	           a.curri_content, a.delete_whether, a.grade, a.class_type_cd, b.staff_no, c.dept_nm, d.authority_cd
+		  from curriculum a, staff b, department c, account d
+	     where a.dept_cd = c.dept_cd and
+               b.account_no = d.account_no and
+		 	   a.delete_whether = 'N' and
+               b.staff_no = #{staff_no}
+       		   <include refid="deptNm"/>
+       		   <include refid="Common-Mapper.PageFooter" />
+	</select>
+		
+		
+		
+	<select id="selectCurriculumStaffCount" resultType="int">
+		select count(*)
+		  from curriculum
+		  where delete_whether = 'N'
+       		   <include refid="search"/>
+	</select>
+	
+	<update id="insertCurriculumStaff">
+        insert into curriculum 
+        values(#{class_no}, (select dept_cd from department where dept_nm=#{dept_nm}),
+              #{class_nm},#{class_score},#{curri_content},'N',#{grade},#{class_type_cd})
+	</update>
+	
+	<update id="deleteCurriculumWhether">
+		update curriculum
+		   set delete_whether = 'Y'
+		 where class_no = #{class_no}
+	</update>
+</mapper>

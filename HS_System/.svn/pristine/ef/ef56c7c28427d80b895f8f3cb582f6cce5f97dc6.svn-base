@@ -1,0 +1,57 @@
+package kr.ac.hs.controller.tuition;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.dto.AccountVO;
+import kr.ac.hs.dto.tuition.TuitionVO;
+import kr.ac.hs.service.tuition.TuitionService;
+
+@Controller
+public class Tuitionontroller {
+	
+	@Autowired
+	private TuitionService service;
+	
+	@RequestMapping("/tuition/pay")
+	public ModelAndView TutionMain(ModelAndView mnv, HttpSession session) throws SQLException{
+		String url = "scholar/student/tuitionStudent";
+		
+		AccountVO loginUser = (AccountVO) session.getAttribute("loginUser");
+		List<TuitionVO> tuitionList = service.getTuitionList(loginUser.getId());
+		
+		mnv.addObject("tuitionList", tuitionList);
+		mnv.setViewName(url);
+		
+		return mnv;
+		
+	}
+	
+	
+/*	@RequestMapping("/tuition/list")
+	public ModelAndView Detail(ModelAndView mnv, HttpSession session) throws SQLException{
+		
+		AccountVO loginUser = (AccountVO) session.getAttribute("loginUser");
+		String studentNo = loginUser.getId();
+		
+		List<TuitionVO> stuTuitionList = service.getTuitionList(studentNo);
+		
+		mnv.addObject("stuTuitionList", stuTuitionList);
+		mnv.setViewName(url);
+		
+		return mnv;
+		
+	}*/
+	
+	
+	
+}

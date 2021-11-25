@@ -1,0 +1,147 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page trimDirectiveWhitespaces="true"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@page import="java.util.Date"%>
+
+<c:set var="pageMaker" value="${dataMap.pageMaker }" />
+<c:set var="cri" value="${pageMaker.cri }" />
+<c:set var="deptStaffScoreList" value="${dataMap.deptStaffScoreList }" />
+
+<head>
+
+<style>
+button {
+   border-radius: 0.2rem;
+}
+
+.card-header .form-control {
+   width: 130px;
+}
+
+.card-header select {
+   padding-left: 2px;
+   text-align: left;
+   margin: 0px 5px;
+}
+
+.card-title {
+   padding-top: 5px;
+}
+
+.card-header {
+   padding-top: 5px;
+   padding-bottom: 5px;
+   padding-right: 40px;
+   padding-left: 10px;
+}
+
+.card-body {
+   padding: 10px;
+}
+
+.scholar-list-header {
+   padding-top: 5px;
+   padding-bottom: 0px;
+   height: 51px;
+}
+
+.scholar-select-group {
+   padding-left: 80px;
+}
+
+.scholar-list-footer {
+   padding-top: 0px;
+}
+
+.scholar-list>.card-header {
+   height: 50px;
+}
+
+/* .scholar-list-card-body {
+   height: 380px;
+} */
+
+.sub-card-body {
+   padding: 0;
+   height: 210px;
+}
+
+.col-6 .card-footer {
+   padding-top: 0;
+}
+
+.card-body .card-body {
+   padding: 0px;
+}
+
+.col-6 input[name=table_search] {
+   width: 180px;
+}
+
+.scholar-select-group {
+   height: 100%;
+}
+
+.scholar-select-group select {
+   height: 100%;
+}
+</style>
+<c:if test="${loginUser.authority_cd ne 'ROLE_STAFF' }">
+   <style>
+.regist-body:hover {
+   text-decoration: underline;
+   cursor: pointer;
+   
+}
+.card-body .form-control {
+   text-align: center;
+}
+</style>
+</c:if>
+
+</head>
+
+<body>
+   <div class="card scholar-list" style="margin-top: 10px;">
+      <div class="card-header">
+         <div class="form-group form-group-sm row">
+            <select class="form-control col-2" id="semester-select" style="">
+               <option value="202201">22년도 1학기</option>
+               <option value="202102">21년도 2학기</option>
+               <option value="202101">21년도 1학기</option>
+               <option value="202002">20년도 2학기</option>
+            </select>
+            <div class="input-group input-group-mb-3 col-4" style="width: 250px;">
+               <input type="text" id="scholar-dept-search" class="form-control float-right select-dept" placeholder="학과명을 입력하세요" <c:if test="${loginUser.authority_cd eq 'ROLE_STAFF' }">value="${dept_nm }" readonly="readonly"</c:if> />
+               <input type="hidden" id="hidden-dept-cd" value="<c:if test="${loginUser.authority_cd eq 'ROLE_STAFF' }">$${dept_nm }</c:if>">
+               <div class="input-group-append">
+                  <button style="border-radius: 0.2rem;" type="button" class="btn btnBlue" onclick="OpenWindow('<%=request.getContextPath()%>/search/department', '학과검색', '650', '600')" <c:if test="${loginUser.authority_cd eq 'ROLE_STAFF' }">
+                        disabled=true   
+                     </c:if>>
+                     <i class="fas fa-search" aria-hidden="true"></i>
+                  </button>
+               </div>
+               <button class="btn btn-primary btnBlue" style="margin-left: 10px;" 
+               onclick="<c:if test="${loginUser.authority_cd eq 'ROLE_STAFF' }">scholarList();unopenedscholarList();registscholarList();</c:if><c:if test="${loginUser.authority_cd eq 'ROLE_SCHOLAR' }">registAcademicList(); </c:if>">검색</button>
+            </div>
+         </div>
+      </div>
+      <div class="card-body">
+         <c:if test="${loginUser.authority_cd eq 'ROLE_STAFF' }">
+            <%@ include file="./role_staff_scholar.jsp"%>
+         </c:if>
+         <c:if test="${loginUser.authority_cd eq 'ROLE_SCHOLAR' }">
+            <%@ include file="./role_scholarStaff_scholar.jsp"%>
+         </c:if>
+      </div>
+   </div>
+<input type="hidden" id="staff_role" value="${loginUser.authority_cd }">
+
+
+<script>
+</script>
+
+
+
+</body>

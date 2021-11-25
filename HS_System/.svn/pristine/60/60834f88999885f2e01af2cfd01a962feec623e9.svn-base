@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="Announce-Mapper">
+
+	<insert id="insertAnnounce">
+		insert into announce values(
+			#{anno_no},
+			#{account_no},
+			#{anno_check_cd},
+			#{anno_content},
+			#{mcode}
+			)
+	</insert>
+	
+	<select id="selectAnnounceSeq" resultType="str">
+		select replace(('AN'||to_char(sysdate,'yyMMdd')||to_char(announce_seq.nextval,'0000')),' ','') from dual
+	</select>
+	
+	<select id="selectAnnounce" resultType="announce">
+		select anno_no, anno_check_cd, anno_content, mcode 
+		from announce where account_no=#{account_no}
+		and anno_check_cd='N'
+	</select>
+	
+	<select id="selectNewAnnounceCount" resultType="int">
+		select count(*) from announce where account_no=#{account_no} and anno_check_cd='N'
+	</select>
+	
+	<update id="updateAnno_noToY">
+		update announce set anno_check_cd='Y' where anno_no=#{anno_no}
+	</update>
+	
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Tuition-Mapper">
+	
+	<select id="selectTuitionList" resultType="tuitionVO">
+        select a.semester, a.student_no, a.tuition_amount, a.payment_amount, a.payment_date, b.scholar_amount
+          from tuition a, scholar b
+		 where a.student_no = b.student_no(+) and
+               a.semester = b.semester(+) and
+		 	   a.student_no = #{student_no}
+		 order by semester desc
+	</select>
+	
+	<select id="selectTuitionDetail" resultType="tuitionVO">
+	    select a.student_no,
+               c.reg_no, 
+               (select b.dept_nm from student a, department b where a.dept_cd = b.dept_cd and a.student_no = #{student_no}) as dept_nm,
+               c.name,
+		       c.reg_no,
+               a.tuition_amount, 
+               d.scholar_amount,
+		       a.payment_amount,
+               a.semester,
+               a.payment_date
+          from tuition a, student b, account c, scholar d
+	     where a.student_no = b.student_no and
+               b.account_no = c.account_no and
+               a.student_no = d.student_no(+) and
+               a.semester = d.semester(+) and
+               a.student_no = #{student_no} and
+	     	   a.semester = #{semester}
+	</select>
+	
+	<update id="updatePayTuition">
+		update tuition 
+		   set payment_date = sysdate
+		 where student_no = #{student_no} and
+		       semester = #{semester} and
+		       payment_amount = #{payment_amount}
+	</update> 
+	
+</mapper>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="LectureTime-Mapper">
+	
+	<sql id="search">
+		<if test="searchType == 'class'.toString()">
+			   and a.class_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'dept'.toString()">
+			   and a.dept_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'all'.toString()">
+			 and (
+			 a.class_name like '%'||#{keyword}||'%'
+			 or
+			a.dept_name like '%'||#{keyword}||'%'
+			 )
+		</if>
+	</sql>
+	
+	<sql id="search3">
+		<if test="cri.searchType == '202102'.toString()">
+			   and a.lecture_semester = '202102'
+		</if>
+		<if test="cri.searchType == '202101'.toString()">
+			   and a.lecture_semester = '202101'
+		</if>
+		<if test="cri.searchType == '202002'.toString()">
+			   and a.lecture_semester = '202002'
+		</if>
+		<if test="cri.searchType == '202001'.toString()">
+			   and a.lecture_semester = '202001'
+		</if>
+
+	</sql>
+	
+	<sql id="search2">
+		<if test="cri.searchType=='pronm'.toString()">
+		  and b.name like '%'||#{cri.keyword}||'%'
+		</if>
+		<if test="cri.searchType=='prono'.toString()">
+		  and a.pro_no like '%'||#{cri.keyword}||'%'
+		</if>
+		<if test="cri.searchType=='all'.toString()">
+		  and (
+		  b.name like '%'||#{cri.keyword}||'%'
+		  or
+		  a.pro_no like '%'||#{cri.keyword}||'%'
+		  )
+		</if>
+	</sql>	
+	
+	
+	
+	<select id="selectLectureList" resultType="lecture">
+		select row_number() over(order by lecture_semester desc) as No, a.*,c.name as pro_name
+		from lecture a, professor b, account c
+		where 1=1
+		and a.pro_no = b.pro_no
+        and b.account_no=c.account_no
+		<include refid="search" />
+		order by lecture_semester desc
+	</select>
+
+	<select id ="selectCountLectureList" resultType="int">
+		select count(*) 
+		from lecture a
+		where 1=1
+		<include refid="search" />
+		order by lecture_semester desc
+	</select>
+	
+	<select id="selectLectureListByStaffNo" resultType="lecture">
+		select row_number() over(order by lecture_semester desc) as No , a.*, d.name as pro_name
+		from lecture a, staff b, professor c, account d
+		where 1=1
+		and b.staff_no = #{staff_no}
+		and b.dept_nm = a.dept_name
+		and a.pro_no = c.pro_no
+        and c.account_no = d.account_no
+		<include refid="search3" />
+		order by lecture_semester desc
+	</select>
+	
+	<select id="selectCountStaffLectureList" resultType="int" parameterType="lecture">
+		select count(*) 
+		from lecture a, staff b, professor c, account d
+		where 1=1
+		and b.staff_no = #{staff_no}
+		and b.dept_nm = a.dept_name
+		and a.pro_no = c.pro_no
+        and c.account_no = d.account_no
+		<include refid="search3" />
+		order by lecture_semester desc
+	</select>
+	
+	<select id="selectLectureProfessorByClassNo" resultType="lecture">
+		select row_number() over(order by lecture_semester desc) as no, a.class_no, a.class_name, c.name as pro_name, a.dept_name
+		from lecture a, professor b, account c
+		where a.class_no = #{class_no}
+		and a.lecture_semester = #{lecture_semester}
+		and a.pro_no = b.pro_no
+		and b.account_no = c.account_no
+	</select>
+	
+	<select id="selectProlistByStaffNo" resultType="lecture">
+		select row_number() over(order by pro_no desc) as no, a.pro_no, b.name as pro_name
+		from professor a, account b, staff c
+		where c.staff_no= #{staff_no}
+        and c.dept_cd = a.dept_cd
+        and a.account_no = b.account_no
+        <include refid="search2" />
+	</select>
+	
+	<select id="selectCountProList" resultType="int" parameterType="lecture">
+		select distinct count(*)
+		from professor a, account b, staff c
+		where c.staff_no= #{staff_no}
+        and c.dept_cd = a.dept_cd
+        and a.account_no = b.account_no
+        <include refid="search2" />
+	</select>
+	
+	<update id="updateProfessor" parameterType="lecture">
+		update lecture
+        set pro_no = #{pro_no}
+        where class_no = #{class_no}
+	</update>
+	
+	<select id="lectureTime" resultType="lectureTime">
+		select row_number() over(order by pro_no desc) as no,b.class_name, a.day, c.period, (select period
+		                                        											from class_time
+		                                       													 where class_timec_cd = a.class_timec_end_cd) as end_period,a.room_no
+		from lecture_timetable a, lecture b, class_time c
+		where a.class_no = #{class_no}
+		and a.lecture_semester = #{lecture_semester}
+		and a.lecture_semester = b.lecture_semester
+		and a.class_no = b.class_no
+		and a.class_timec_start_cd = c.class_timec_cd	
+	</select>
+	
+</mapper>

@@ -1,0 +1,30 @@
+package kr.ac.hs.controller.lecture;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.ac.hs.dto.AccountVO;
+import kr.ac.hs.dto.lecture.LectureManagemenProfVO;
+
+@Controller
+public class AttendanceController {
+
+	@RequestMapping("/attendance/attendanceCheck")
+	public ModelAndView attendanceCheck(String id, ModelAndView mnv)  throws SQLException {
+		
+		String url = null;
+		
+		System.out.println("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ "+id);
+		// 마찬가지로 화면에서 학번을 파이썬으로, 넘겨준다.
+		
+		return mnv;
+
+	}
+	
+}

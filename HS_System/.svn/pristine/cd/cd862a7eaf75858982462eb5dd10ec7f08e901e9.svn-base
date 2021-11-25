@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StaffApplicant-Mapper">
+	
+<!-- 	<sql id="deptSearch">
+		<if test="dept_cd != null">
+			and b.dept_nm = #{dept_nm}
+		</if>
+	</sql> -->
+	
+	<sql id="search">
+	    <if test="cri.searchType == 'pf'.toString()">
+			and a.pass_whether like '%'||#{keyword}||'%'
+		</if>
+		<if test="cri.searchType == 're'.toString()">
+			and a.regist_check like '%'||#{cri.keyword}||'%'
+		</if>     
+		<if test="cri.searchType == 'adept'.toString()">
+			and  b.dept_nm like '%'||#{cri.keyword}||'%'
+		</if>
+		<if test="cri.searchType == 'nm'.toString()">
+			and a.name like '%'||#{cri.keyword}||'%'
+		</if>
+	</sql>
+	
+	<!-- 지원자 목록조회 -->
+	<select id="selectApplicant" resultType="staffApplicant">
+		select row_number() over(order by a.registdate desc)as no, a.applicant_no, a.name, b.dept_nm, a.pass_whether, a.regist_check, a.registdate
+		 from applicant a, department b
+		where a.appli_dept = b.dept_cd
+      and to_char(registdate,'yyyy/mm') = '2020/11'
+			 <include refid="search"/>
+	</select>
+	
+	<select id="selectApplicantListCount" resultType="int">
+		select count(*)
+		  from applicant a, department b
+		 where a.appli_dept = b.dept_cd
+		       and to_char(registdate,'yyyy/mm') = '2020/11'
+	 		   <include refid="search"/>
+	</select>
+	
+	<!-- 상세보기 -->
+	<select id="selectApplicantDetail" resultType="staffApplicant">
+		select a.applicant_no, a.name, a.reg_no, a.appli_dept, a.email, a.address, a.detail_add, a.phone, b.dept_nm, a.pass_whether, a.regist_check
+		  from applicant a, department b
+		 where a.appli_dept = b.dept_cd and 
+		       to_char(registdate,'yyyy/mm') = '2020/11' and 
+		       applicant_no = #{applicant_no}
+      		  
+	</select> 
+	
+	<!-- 합격,불합격 여부  -->
+	<update id="updatetApplicantPassOrFail" >
+		update applicant 
+		   set regist_check = 'N',
+		   	   pass_whether = #{pass_whether}
+		 where applicant_no = #{applicant_no}
+	</update> 
+	
+
+	<!-- 계정 등록 -->
+	<!-- 계정번호 시퀀스 생성 -->
+	<select id="selectAccountNo_SEQ" resultType="str">
+		select ACCOUNT_SEQ.NEXTVAL from dual
+	</select>
+	
+	<update id="insertApplicantToAccount">
+		insert into account 
+			  values(ACCOUNT_SEQ.NEXTVAL, '1234', 
+    			    (select picture from applicant where  applicant_no = #{applicant_no}),
+					(select name from applicant where  applicant_no = #{applicant_no}),
+					(select reg_no from applicant where  applicant_no = #{applicant_no}),
+					(select email from applicant where  applicant_no = #{applicant_no}),
+					'1', 'ROLE_STUDENT', '(null)', 
+					(select phone from applicant where  applicant_no = #{applicant_no})) 	
+    </update>
+	
+	<!-- 신입생 등록 -->
+	<update id="insertApplicantToStudent">
+      insert into student(student_no, status_cd, applicant_no, dept_cd, account_no, faculty_code)
+      values( (select to_char(sysdate, 'yyyy') from dual) || (select substr(dept_cd,2) from applicant where applicant_no = '23') || '0'  ||to_char(STUNO_SEQ.NEXTVAL) ,
+         	 'CCDA001', 
+         	 #{applicant_no}, 
+         	 (select dept_cd from applicant where applicant_no = #{applicant_no} ), 
+         	 (select a.account_no from account a, applicant b  where a.phone = b.phone and a.email = b.email and b.applicant_no = #{applicant_no} ), 
+         	 (select b.faculty_cd from applicant a, department b where a.dept_cd = b.dept_cd and a.applicant_no = #{applicant_no} ) )
+             
+	</update>
+	
+</mapper>

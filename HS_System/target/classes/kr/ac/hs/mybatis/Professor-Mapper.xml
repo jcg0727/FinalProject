@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Professor-Mapper">
+
+	<select id="selectProfessorbyProNo" parameterType="str"
+		resultType="professor">
+		select *
+		from professor A, account B
+		where pro_no= #{pro_no}
+		AND a.account_no = b.account_no
+
+	</select>
+
+	<!-- 지도교수명 조회 -->
+	<select id="selectProfessorNm" parameterType="str"
+		resultType="professor">
+		SELECT
+		a.name AS pro_name
+		FROM
+		account a,
+		professor b,
+		advisor
+		c,
+		student d
+		WHERE
+		b.account_no =
+		a.account_no
+		and b.PRO_NO=c.PRO_NO
+		and
+		c.STUDENT_NO= d.STUDENT_NO
+		and
+		d.STUDENT_NO =
+		#{student_no,jdbcType=VARCHAR}
+	</select>
+</mapper>

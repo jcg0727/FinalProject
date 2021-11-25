@@ -1,0 +1,14 @@
+package kr.ac.hs.service.lecture;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.ac.hs.dto.lecture.LectureManagemenProfVO;
+
+public interface LectureManagementProfService {
+	
+	// 교수 강의조회
+	public List<LectureManagemenProfVO> getLectureList_prof (String pro_no) throws SQLException;
+
+}

@@ -1,0 +1,13 @@
+package kr.ac.hs.dao.lecture;
+
+import org.apache.ibatis.session.SqlSession;
+
+public class LectureStdDAOImpl implements LectureStdDAO {
+
+	private SqlSession session;
+
+	public void setSession(SqlSession session) {
+		this.session = session;
+	}
+
+}

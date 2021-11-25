@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AttendanceStatus-Mapper">
+	<select id="selectThisWeekAttendance" resultType="attendanceStatus">
+		select (trunc(to_number(to_date(to_char(end_date, 'yyyymmdd'), 'yyyymmdd') - to_date(to_char(start_date,'yyyymmdd'))) / 7) + 1)*class_cnt as totalCount,
+        (select count(*) from lecture_register where lecture_semester = b.lecture_semester and class_no = b.class_no and status_cd = 'CCDN001')*class_cnt as todayCount,
+	       
+		(select sum(cnt)
+		from
+		(select count(class_date) as cnt
+		from attendance a,
+		(select class_no, lecture_semester, case when day = '월' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 ), 'yyyy/mm/dd')
+		            when day = '화' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 )+1, 'yyyy/mm/dd')
+		            when day = '수' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 )+2, 'yyyy/mm/dd')
+		            when day = '목' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 )+3, 'yyyy/mm/dd')
+		            when day = '금' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 )+4, 'yyyy/mm/dd')
+		            end as class_date
+		        from lecture_timetable where class_no = #{classNo} and lecture_semester = #{lectureSemester}) b
+		where a.class_no = b.class_no
+		  and a.lecture_semester = b.lecture_semester
+		  and a.attend_date = b.class_date
+		)) as attenCount,
+			       
+		(select sum(cnt)
+		from
+		(select count(class_date) as cnt
+		from attendance a,
+		(select class_no, lecture_semester, case when day = '월' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 ), 'yyyy/mm/dd')
+		            when day = '화' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 )+1, 'yyyy/mm/dd')
+		            when day = '수' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 )+2, 'yyyy/mm/dd')
+		            when day = '목' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 )+3, 'yyyy/mm/dd')
+		            when day = '금' then to_char( sysdate-( (select to_char(sysdate,'D') from dual) -2 )+4, 'yyyy/mm/dd')
+		            end as class_date
+		        from lecture_timetable where class_no = #{classNo} and lecture_semester = #{lectureSemester}) b
+		where a.class_no = b.class_no
+		  and a.lecture_semester = b.lecture_semester
+		  and a.attend_date = b.class_date
+		  and a.tardy = 'Y'
+		)) as tardyCount
+			 
+		 from 
+		 (select cal_semester,start_date, end_date
+		 from academic_calendar
+		 where status_cd = 'CCDX001'
+		 and cal_semester = #{lectureSemester}) a,
+		  	       
+		 (select lecture_semester, class_no, count(*) as class_cnt
+		 from lecture_timetable
+		 where class_no = #{classNo}
+		 and lecture_semester = #{lectureSemester} group by lecture_semester, class_no) b
+		 where a.cal_semester = b.lecture_semester
+	</select>
+	
+	<select id="selectlastWeekAttendance" resultType="attendanceStatus">
+		select (trunc(to_number(to_date(to_char(end_date, 'yyyymmdd'), 'yyyymmdd') - to_date(to_char(start_date,'yyyymmdd'))) / 7) + 1)*class_cnt as totalCount,
+        (select count(*) from lecture_register where lecture_semester = b.lecture_semester and class_no = b.class_no and status_cd = 'CCDN001')*class_cnt as todayCount,
+	       
+		(select sum(cnt)
+		from
+		(select count(class_date) as cnt
+		from attendance a,
+		(select class_no, lecture_semester, case when day = '월' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 ), 'yyyy/mm/dd')
+								                 when day = '화' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 )+1, 'yyyy/mm/dd')
+								                 when day = '수' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 )+2, 'yyyy/mm/dd')
+								                 when day = '목' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 )+3, 'yyyy/mm/dd')
+								                 when day = '금' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 )+4, 'yyyy/mm/dd')
+		              end as class_date
+		        from lecture_timetable where class_no = #{classNo} and lecture_semester = #{lectureSemester}) b
+		where a.class_no = b.class_no
+		  and a.lecture_semester = b.lecture_semester
+		  and a.attend_date = b.class_date
+		)) as attenCount,
+			       
+		(select sum(cnt)
+		from
+		(select count(class_date) as cnt
+		from attendance a,
+		(select class_no, lecture_semester, case when day = '월' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 ), 'yyyy/mm/dd')
+									             when day = '화' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 )+1, 'yyyy/mm/dd')
+									             when day = '수' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 )+2, 'yyyy/mm/dd')
+									             when day = '목' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 )+3, 'yyyy/mm/dd')
+									             when day = '금' then to_char( (sysdate-7)-( (select to_char(sysdate-7,'D') from dual) -2 )+4, 'yyyy/mm/dd')
+		            end as class_date
+		        from lecture_timetable where class_no = #{classNo} and lecture_semester = #{lectureSemester}) b
+		where a.class_no = b.class_no
+		  and a.lecture_semester = b.lecture_semester
+		  and a.attend_date = b.class_date
+		  and a.tardy = 'Y'
+		)) as tardyCount
+			 
+		 from 
+		 (select cal_semester,start_date, end_date
+		 from academic_calendar
+		 where status_cd = 'CCDX001'
+		 and cal_semester = #{lectureSemester}) a,
+		  	       
+		 (select lecture_semester, class_no, count(*) as class_cnt
+		 from lecture_timetable
+		 where class_no = #{classNo}
+		 and lecture_semester = #{lectureSemester} group by lecture_semester, class_no) b
+	</select>
+	
+	<select id="selectThisSemesterAttendance" resultType="attendanceStatus">
+	select (trunc(to_number(to_date(to_char(end_date, 'yyyymmdd'), 'yyyymmdd') - to_date(to_char(start_date,'yyyymmdd'))) / 7) + 1)*class_cnt as totalCount,
+	       (trunc(to_number(to_date(to_char(sysdate, 'yyyymmdd'), 'yyyymmdd') - to_date(to_char(start_date,'yyyymmdd'),'yyyymmdd')) / 7) + 1)*class_cnt as todayCount,
+	       (select count(*) as atten_cnt from attendance where lecture_semester = b.lecture_semester and class_no = b.class_no) as attenCount,
+	       (select count(*) as atten_cnt from attendance where lecture_semester = b.lecture_semester and class_no = b.class_no and tardy = 'Y') as tardyCount
+	  from (select cal_semester,start_date, end_date from academic_calendar where status_cd = 'CCDX001' and cal_semester = #{lectureSemester}) a,
+  	       (select lecture_semester, class_no, count(*) as class_cnt from lecture_timetable where class_no = #{classNo} and lecture_semester = #{lectureSemester} group by lecture_semester, class_no) b
+ 	 where a.cal_semester = b.lecture_semester
+	</select>
+	
+	<select id="selectThisSemesterAttendRate" resultType="attendanceStatus">
+	<![CDATA[
+	SELECT week, todayCount, SUM(ATTENDCNT)/SUM(CLASSCNT)*100 AS attenCount
+	FROM
+	    (
+	    SELECT
+	        WEEK, TO_DAY, TODAYCOUNT, COUNT(*) OVER(PARTITION BY WEEK) AS CLASSCNT,
+	        (SELECT COUNT(*) FROM ATTENDANCE WHERE ATTEND_DATE = TO_DAY) AS ATTENDCNT
+	    FROM
+	        (SELECT TO_DATE(TODAY, 'YYYYMMDD') AS TO_DAY 
+	               ,TRUNC(TO_NUMBER(TO_DATE(TODAY, 'YYYYMMDD') - TO_DATE(START_DATE,'YYYYMMDD')) / 7) + 1 AS WEEK 
+	               ,TRUNC(TO_NUMBER(TO_DATE(TO_CHAR(SYSDATE,'YYYYMMDD'), 'YYYYMMDD') - TO_DATE(START_DATE,'YYYYMMDD')) / 7) + 1 AS TODAYCOUNT 
+	          FROM  (
+	                SELECT
+	                    START_DATE, DAY, TODAY, COUNT(*) OVER(PARTITION BY DAY) AS COUNT
+	                FROM
+	                    (
+	                    SELECT A.DAY, B.TODAY, TO_CHAR(START_DATE, 'YYYYMMDD')AS START_DATE
+	                    FROM  (SELECT day FROM lecture_timetable WHERE class_no = #{classNo} AND lecture_semester = #{lectureSemester}) A,
+	                    (SELECT  TO_CHAR (start_date + LEVEL - 1, 'YYYYMMDD') TODAY
+	                             ,TO_CHAR(start_date + LEVEL - 1,'DY') DAYS_K
+	                             ,START_DATE
+	                        FROM (SELECT start_date FROM academic_calendar WHERE status_cd = 'CCDX001' AND cal_semester = #{lectureSemester}) 
+	                        CONNECT BY start_date + LEVEL - 1 <= (SELECT end_date FROM academic_calendar WHERE status_cd = 'CCDX001' AND cal_semester = #{lectureSemester})
+	                    ) B
+	                    WHERE A.day = B.DAYS_K group by A.DAY, B.TODAY,TO_CHAR(START_DATE, 'YYYYMMDD')
+	                    )
+	                )
+	        ORDER BY WEEK)
+	    ) group by WEEK, TODAYCOUNT
+	    order by week
+	  ]]>
+	</select>
+</mapper>

@@ -1,0 +1,94 @@
+package kr.ac.hs.service.scholar;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import kr.ac.hs.command.PageMaker;
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.dao.applicant.StaffApplicantDAO;
+import kr.ac.hs.dao.scholar.ScholarDAO;
+import kr.ac.hs.dto.applicant.StaffApplicantVO;
+import kr.ac.hs.dto.scholar.ScholarVO;
+
+public class ScholarServiceImpl implements ScholarService {
+
+	private ScholarDAO scholarDAO;
+	
+	public ScholarDAO getScholarDAO() {
+		return scholarDAO;
+	}
+
+	public void setScholarDAO(ScholarDAO scholarDAO) {
+		this.scholarDAO = scholarDAO;
+	}
+	
+
+	@Override
+	public Map<String, Object> getStudentDeptStaffScoreList(Map<String, Object> dataMap) throws SQLException {
+		
+		List<ScholarVO> deptStaffScoreList = scholarDAO.selectStudentDeptStaffScoreList(dataMap);
+		
+		PageMaker pageMaker = new PageMaker();
+		SearchCriteria cri = (SearchCriteria) dataMap.get("cri");
+		
+		pageMaker.setCri(cri);
+		
+		if (deptStaffScoreList != null && deptStaffScoreList.size() > 0) {
+			pageMaker.setTotalCount(deptStaffScoreList.get(0).getTotalcnt());
+		}
+		
+		dataMap.put("deptStaffScoreList", deptStaffScoreList);
+		dataMap.put("pageMaker", pageMaker);
+		
+		return dataMap;
+		
+	}
+
+	@Override
+	public void registDeptStaffScholar(String student_no) throws SQLException {
+		scholarDAO.insertDeptStaffScholar(student_no);
+		
+		
+	}
+
+	@Override
+	public void removeDeptStaffScholarStu(String student_no) throws SQLException {
+		scholarDAO.deleteDeptStaffScholarStu(student_no);
+	}
+
+	
+	
+	@Override
+	public Map<String, Object> getStudentScholarRecommend(Map<String, Object> dataMap) throws SQLException {
+		List<ScholarVO> StaffRecommendList = scholarDAO.selectStudentScholarRecommend(dataMap);
+		
+		PageMaker pageMaker = new PageMaker();
+		SearchCriteria cri = (SearchCriteria) dataMap.get("cri");
+		
+		pageMaker.setCri(cri);
+		
+		if (StaffRecommendList != null && StaffRecommendList.size() > 0) {
+			pageMaker.setTotalCount(StaffRecommendList.get(0).getTotalcnt());
+		}
+		
+		dataMap.put("StaffRecommendList", StaffRecommendList);
+		dataMap.put("pageMaker", pageMaker);
+		
+		return dataMap;
+	}
+
+	@Override
+	public void modifyScholarStaffStu(ScholarVO scholarVO) throws SQLException {
+		scholarDAO.updateScholarStaffStu(scholarVO);
+	}
+
+	@Override
+	public void removeScholarStaffStu(ScholarVO scholarVO) throws SQLException {
+		scholarDAO.DeleteScholarStaffStu(scholarVO);
+		
+	}
+	
+
+}

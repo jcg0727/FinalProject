@@ -1,0 +1,29 @@
+package kr.ac.hs.dao.scholar;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.ac.hs.dto.scholar.ScholarVO;
+
+
+public interface ScholarDAO {
+		
+		String selectDeptNmDeptStaff(String staff_no) throws SQLException;
+		
+		List<ScholarVO> selectStudentDeptStaffScoreList(Map<String, Object> dataMap) throws SQLException;
+		
+		void insertDeptStaffScholar(String student_no) throws SQLException;
+		
+		void deleteDeptStaffScholarStu(String student_no) throws SQLException;
+		
+		
+		List<ScholarVO> selectStudentScholarRecommend (Map<String, Object> dataMap) throws SQLException; 
+		
+		void updateScholarStaffStu(ScholarVO scholarVO) throws SQLException;
+		
+		void DeleteScholarStaffStu(ScholarVO scholarVO) throws SQLException;
+	
+
+		
+}

@@ -1,0 +1,39 @@
+package kr.ac.hs.controller.lecture;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.ac.hs.dto.AccountVO;
+import kr.ac.hs.dto.lecture.LectureManagemenProfVO;
+import kr.ac.hs.service.lecture.LectureManagementProfService;
+
+@Controller
+public class LectureProfController {
+	
+	
+	@Autowired
+	private LectureManagementProfService lectureManagementProfService;
+	
+	@RequestMapping("/lecture/management_prof")
+	public ModelAndView management_prof(HttpSession session, ModelAndView mnv)  throws SQLException {
+		String url = "/lecture/prof/management_prof";
+		
+		AccountVO loginUser = (AccountVO) session.getAttribute("loginUser");
+		String pro_no = loginUser.getId();
+		
+		List<LectureManagemenProfVO> lectureList_prof = lectureManagementProfService.getLectureList_prof(pro_no);
+		
+		mnv.addObject("lectureList_prof",lectureList_prof);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+}

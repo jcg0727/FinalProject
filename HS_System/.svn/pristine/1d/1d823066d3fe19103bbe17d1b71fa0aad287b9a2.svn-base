@@ -1,0 +1,20 @@
+package kr.ac.hs.controller.lecture;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.ac.hs.service.lecture.LectureStdService;
+
+@Controller
+public class LectureStdController {
+
+	@Autowired
+	LectureStdService service;
+
+	@RequestMapping("/lecture/management_st")
+	public String LectureStdMain() {
+		return "lecture/student/lectureStuManagement";
+	}
+
+}

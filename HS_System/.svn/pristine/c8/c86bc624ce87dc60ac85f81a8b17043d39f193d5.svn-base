@@ -1,0 +1,160 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+
+<div class="row">
+
+	<div class="form-group col-6">
+		<div class="card">
+		
+			<div class="card-header">
+				<h3 class="card-title">수강생 리스트</h3>
+			</div>
+			<div class="card-body">
+			
+			<!-- <div class="card-body table-responsive p-0"> -->
+				<table id="studentList" class="table table-hover table-sm" style="font-size: 15px;">
+					<thead>
+						<tr style="text-align: center;">
+							<th>이름</th>
+							<th>학번</th>
+							<th>학과</th>
+							<th>출석</th>
+						</tr>
+					</thead>
+					<tbody class="lectureStudentListTable" style="text-align: center;">
+
+					</tbody>
+				</table>
+			<!-- </div> -->
+			
+			
+			
+			</div><!-- card-body -->
+		
+		</div><!-- card -->
+	</div><!-- form-group col-6 -->
+	
+	
+	<div class="form-group col-6">
+		<div class="card">
+		
+			<div class="card-header">
+				<h3 class="card-title">출석체크</h3>
+				<input type="button" value="얼굴인식" class="btn btn-sm btnGray text-white" id="faceRecognitionBtn" onclick="takeSnapshot();" style="height: 31px; margin: center; float:right;">
+				
+			</div>
+			<div class="card-body">
+
+					<video id="myVideo" width="400" height="400" style=""></video>
+					<canvas id="myCanvas" width="400" height="400" style="border: 1px solid #ddd;"></canvas>
+					<br>
+
+					<!-- 		<input type=button value="get Video" onclick="getVideo();"> -->
+					<!-- 		<input type="hidden" id="myInterval"  value="3000"> -->
+					<!-- 		<input type=button value="서버전송" onclick="server()"> -->
+					<form id="frm" method="post" action="http://127.0.0.1:5000/attendance">
+						<input type="hidden" name="id1" />
+						<input type="hidden" name="studentNo1" />
+						<input type="hidden" name="classNo1"/>
+						
+					</form>
+
+
+			</div><!-- card-body -->
+		
+		</div><!-- card -->
+	</div><!-- form-group col-6 -->
+	
+	
+</div><!-- row -->
+
+
+<script>
+var myVideoStream = document.getElementById('myVideo')     // make it a global variable
+var myStoredInterval = 0
+
+
+window.onload=function(){
+	
+	// 수강생리스트 출력
+	lectureStudentList();
+	
+	const constraints={audio: false, video: true };
+	
+navigator.mediaDevices.getUserMedia(constraints)
+.then(function(stream){
+     myVideoStream.srcObject = stream;
+      myVideoStream.onloadedmetadata = function(e){
+      	myVideoStream.play();
+	 }; 
+ })
+$('#btnLogin').on('click', function(){
+	$('#frm > input[name=id1]').val($('#userid').val());
+	$('#frm > input[name=pwd1]').val($('#userpassword').val());
+	$('#frm > input[name=gubun1]').val($('#gubun').val());
+});
+
+$("#studentList").on('click', '.lectureStudentListBody', function(){
+	
+	var td = $(this).children();
+	// 클릭한 학생의 학번 값
+	var studentNo = td.eq(1).text();
+	
+	console.log("test 해보쟈~~~~~~~~~~~~~~~~~~~~"+studentNo);
+	// hidden에 넣어주기
+	$('#frm > input[name=studentNo1]').val(studentNo); 
+	$('#frm > input[name=classNo1]').val("${class_no}" );
+	
+});
+
+}
+
+function takeSnapshot() {
+ var myCanvasElement = document.getElementById('myCanvas');
+ var myCTX = myCanvasElement.getContext('2d');
+ myCTX.drawImage(myVideoStream, 0, 0, myCanvasElement.width, myCanvasElement.height);
+ server();
+}
+
+function server() {
+     const canvas = document.getElementById('myCanvas');
+     const imgBase64 = canvas.toDataURL('image/png', 1.0);
+     
+	
+     var input = document.createElement('input');
+     input.setAttribute('type', 'hidden');
+     input.setAttribute('name', 'imgBase64');
+     input.value = imgBase64;
+
+     document.getElementById('frm').append(input);
+     document.getElementById('frm').submit();
+};
+
+</script>
+
+<!-- jQuery -->
+<script src="<%=request.getContextPath()%>/resources/bootstrap/plugins/jquery/jquery.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+<script id="lectureStudentList" type="text/x-handlebars-template">
+{{#each .}}
+			<tr class="lectureStudentListBody" style="text-align: center;">
+				<td>{{student_name}}</td>
+				<td id="studentNo" name="studentNo">{{student_no}}</td>
+				<td>{{dept_nm}}</td>
+				
+				<td>
+					{{#ifEquals attendanceStatus "0"}}
+						<button type="button" onclick="" class="btn btnGray btn-xs text-white"> &nbsp;ㅡ&nbsp; </button>
+					{{else ifEquals attendanceStatus "1"}}
+						<button type="button" onclick="" class="btn btnBlue btn-xs text-white"> &nbsp;O&nbsp;  </button>
+					{{/ifEquals}}
+				</td>
+			</tr>
+{{/each}}
+</script>	
+
+
+
+	

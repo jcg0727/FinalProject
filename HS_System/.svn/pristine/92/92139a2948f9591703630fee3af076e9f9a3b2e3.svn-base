@@ -1,0 +1,20 @@
+package kr.ac.hs.service.notice;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.ac.hs.command.Criteria;
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.dto.notice.NoticeVO;
+
+public interface NoticeService {
+	
+	public List<NoticeVO> selectNoticeY()throws SQLException;
+	/*
+	public List<NoticeVO> selectNoticeN()throws SQLException;
+	public List<NoticeVO> selectNoticeN(Criteria cri)throws SQLException;*/
+	Map<String, Object> selectNoticeN(SearchCriteria cri)throws SQLException;
+	
+	
+}

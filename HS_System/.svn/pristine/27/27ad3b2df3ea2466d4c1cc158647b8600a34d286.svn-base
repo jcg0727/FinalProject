@@ -1,0 +1,15 @@
+package kr.ac.hs.dao.attendance;
+
+import java.sql.SQLException;
+
+import kr.ac.hs.dto.attendance.AttendanceStatusVO;
+
+public interface AttendanceStatusDAO {
+
+	public AttendanceStatusVO selectThisWeekAttendance(AttendanceStatusVO attdenace) throws SQLException;
+
+	public AttendanceStatusVO selectlastWeekAttendance(AttendanceStatusVO attdenace) throws SQLException;
+
+	public AttendanceStatusVO selectThisSemesterAttendance(AttendanceStatusVO attdenace) throws SQLException;
+
+}

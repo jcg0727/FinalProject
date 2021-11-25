@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias type="java.lang.String" alias="str" />
+		<typeAlias type="java.lang.Integer" alias="int" />
+		<typeAlias type="java.lang.Double" alias="double" />
+		
+		<!-- Changgyun -->
+		<typeAlias type="kr.ac.hs.dto.academic.StudentVO" alias = "student"/>
+		<typeAlias type="kr.ac.hs.dto.AccountVO" alias = "account"/>
+		<typeAlias type="kr.ac.hs.dto.ProfessorVO" alias = "professor"/>
+		<typeAlias type="kr.ac.hs.dto.common.StaffVO" alias = "staff"/>
+		<typeAlias type="kr.ac.hs.dto.academic.PluralMajorVO" alias = "plural"/>
+		<typeAlias type="kr.ac.hs.dto.academic.PluralCounselVO" alias = "pluralCounsel"/>
+		<typeAlias type="kr.ac.hs.dto.common.CounselVO" alias="counsel"/>
+		<typeAlias type="kr.ac.hs.dto.common.CounselSelectVO" alias="counselSelect"/>
+		<typeAlias type="kr.ac.hs.dto.lecture.LectureVO" alias="lecture"/>
+		<typeAlias type="kr.ac.hs.dto.lecture.LectureTimeVO" alias="lectureTime"/>
+		
+		<!-- Hyeji -->
+		<typeAlias type="kr.ac.hs.dto.AcademicStateVO" alias="academicState"/>
+		<typeAlias type="kr.ac.hs.dto.AcademicAttachVO" alias="academicAttach"/>
+		<typeAlias type="kr.ac.hs.dto.AcademicCounselVO" alias="academicCounsel"/>
+		<typeAlias type="kr.ac.hs.dto.academic.AcademicStateStaffVO" alias="academicStateStaff"/>
+		<typeAlias type="kr.ac.hs.dto.applicant.StaffApplicantVO" alias="staffApplicant"/>
+		<typeAlias type="kr.ac.hs.dto.scholar.ScholarVO" alias="scholarVO"/>
+		<typeAlias type="kr.ac.hs.dto.tuition.TuitionVO" alias="tuitionVO"/>
+		
+		<!-- Minseok -->		
+		<typeAlias type="kr.ac.hs.dto.academic.DepartmentChangeVO" alias="depChange"/>
+		<typeAlias type="kr.ac.hs.dto.common.MenuVO" alias="menu"/>
+		<typeAlias type="kr.ac.hs.dto.AcademicCalendarVO" alias="academicCalender"/>
+		<typeAlias type="kr.ac.hs.dto.common.AttachVO" alias="attach"/>
+		<typeAlias type="kr.ac.hs.dto.common.AdvisorVO" alias="advisor"/>
+		<typeAlias type="kr.ac.hs.dto.grades.GradesVO" alias="grades"/>
+		<typeAlias type="kr.ac.hs.dto.lecture.CurriculumVO" alias="curriculum"/>
+		<typeAlias type="kr.ac.hs.dto.grades.GradesDissentVO" alias="gradesDissent"/>
+		<typeAlias type="kr.ac.hs.dto.attendance.AttendanceStatusVO" alias="attendanceStatus"/>
+		<typeAlias type="kr.ac.hs.dto.counsel.CounselLectureVO" alias="counselLecture"/>
+		
+		<!-- eunjoo -->
+		<!-- 학과VO -->
+		<typeAlias type="kr.ac.hs.dto.DepartmentVO" alias="department"/>
+		<!-- 강의계획VO -->
+		<typeAlias type="kr.ac.hs.dto.LecturePlanVO" alias="lecturePlan"/>
+		<!-- 학사일정VO -->
+		<typeAlias type="kr.ac.hs.dto.AcademicCalendarVO" alias="academicCalendar"/>
+		<typeAlias type="kr.ac.hs.dto.StudentAcuntVO" alias="studentAcunt"/>
+
+		<!-- Seung Eun -->
+		<typeAlias type="kr.ac.hs.dto.AcademicChangeVO" alias="academicChange"/>
+		<typeAlias type="kr.ac.hs.dto.sugang.LectureListVO" alias="lectureList"/>
+		<typeAlias type="kr.ac.hs.dto.sugang.LectureRegisterVO" alias="lectureRegister"/>
+		<typeAlias type="kr.ac.hs.dto.sugang.BoguanVO" alias="boguan"/>
+		<typeAlias type="kr.ac.hs.dto.sugang.SugangApplySuccessVO" alias="sugangApplySuccess"/>
+		<typeAlias type="kr.ac.hs.dto.sugang.ApplyCompleteLectureVO" alias="applyCompleteLecture"/>
+		<typeAlias type="kr.ac.hs.dto.sugang.ApplyExpectedLectureVO" alias="applyExpectedLecture"/>
+		<typeAlias type="kr.ac.hs.dto.lecture.LecturePlanVO2" alias="lecturePlan2"/>	
+		<typeAlias type="kr.ac.hs.dto.lecture.LectureManagemenProfVO" alias="lectureManagemenProf"/>
+		<typeAlias type="kr.ac.hs.dto.lecture.LectureStudentListVO" alias="lectureStudentList"/>
+		<typeAlias type="kr.ac.hs.dto.sugang.LectureEvaluationScoreVO" alias="lectureEvaluationScore"/>
+		<typeAlias type="kr.ac.hs.dto.attendance.AttendanceVO" alias="attendance"/>
+		<typeAlias type="kr.ac.hs.dto.sugang.ApplyLessonVO" alias="applyLesson"/>	
+		
+		
+		
+		<typeAlias type="kr.ac.hs.dto.LecturePlanVO" alias="lecturePlan"/>	
+		
+		<!-- soohyang -->	
+		<typeAlias type="kr.ac.hs.dto.StudentInformationVO" alias = "stuInfo"/>
+		<typeAlias type="kr.ac.hs.dto.AcademicFreshmenVO" alias="freshmen"/>
+		<typeAlias type="kr.ac.hs.dto.sugang.ExSugangListVO" alias="exSugang"/>
+		<typeAlias type="kr.ac.hs.dto.graduation.GraduationVO" alias="graduation"/>	
+		<typeAlias type="kr.ac.hs.dto.common.AnnounceVO" alias="announce"/>
+		<typeAlias type="kr.ac.hs.dto.notice.NoticeVO" alias="notice"/>
+		<typeAlias type="kr.ac.hs.dto.common.Counsel2VO" alias="counsel2"/>
+		
+			
+	</typeAliases>
+		
+
+</configuration>
+
+
+
+
+
+

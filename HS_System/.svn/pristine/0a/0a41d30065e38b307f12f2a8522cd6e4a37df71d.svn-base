@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AttendanceStatus-Mapper">
+	<select id="selectThisWeekAttendance" resultType="attendanceStatus">
+		
+	</select>
+	
+	<select id="selectlastWeekAttendance" resultType="attendanceStatus">
+	
+	</select>
+	
+	<select id="selectThisSemesterAttendance" resultType="attendanceStatus">
+	select (trunc(to_number(to_date(to_char(end_date, 'yyyymmdd'), 'yyyymmdd') - to_date(to_char(start_date,'yyyymmdd'))) / 7) + 1)*class_cnt as totalCount,
+	       (trunc(to_number(to_date(to_char(sysdate, 'yyyymmdd'), 'yyyymmdd') - to_date(to_char(start_date,'yyyymmdd'),'yyyymmdd')) / 7) + 1)*class_cnt as todayCount,
+	       (select count(*) as atten_cnt from attendance where lecture_semester = b.lecture_semester and class_no = b.class_no) as attenCount,
+	       (select count(*) as atten_cnt from attendance where lecture_semester = b.lecture_semester and class_no = b.class_no and tardy = 'Y') as tardyCount
+	  from (select cal_semester,start_date, end_date from academic_calendar where status_cd = 'ccdx001' and cal_semester = #{lecture_semester}) a,
+  	       (select lecture_semester, class_no, count(*) as class_cnt from lecture_timetable where class_no = #{class_no} and lecture_semester = #{lecture_semester} group by lecture_semester, class_no) b
+ 	 where a.cal_semester = b.lecture_semester
+	</select>
+</mapper>

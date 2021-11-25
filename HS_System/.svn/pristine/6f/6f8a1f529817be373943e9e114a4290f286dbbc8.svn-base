@@ -1,0 +1,385 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+   pageEncoding="UTF-8"%>
+<%@ page trimDirectiveWhitespaces="true"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<c:set var="pageMaker" value="${dataMap.pageMaker }" />
+<c:set var="cri" value="${pageMaker.cri }" />
+<c:set var="counselList" value="${dataMap.counselList }" /> 
+
+<head>
+<title>Insert title here</title>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+
+<script src="<%=request.getContextPath() %>/resources/bootstrap/plugins/jquery/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+<script>
+$(function () {
+ 
+
+  //Timepicker
+  $('#timepicker').datetimepicker({
+    format: 'LT'
+  })
+  
+
+})
+function list_go3(page,url){
+	   if(!url) url= window.location.href
+	   
+	   var jobForm3=$('#jobForm3');
+	   
+	   if(!page) page=1;
+
+	   jobForm3.find("[name='page']").val(page);
+
+	   if($('select[name="perPageNum"]').val()){
+	      jobForm3.find("[name='perPageNum']").val($('select[name="perPageNum"]').val());
+	   }
+	   
+	   console.log(jobForm3.find("[name='perPageNum']").val());
+	      
+	   jobForm3.find("[name='searchType']").val($('select[name="searchType"]').val());
+	   jobForm3.find("[name='searchType2']").val($('select[name="searchType2"]').val());
+	   jobForm3.find("[name='keyword']").val($('div.input-group>input[name="keyword"]').val());
+	   
+	   jobForm3.attr({
+	      action:url,
+	      method:'get'
+	   }).submit();
+	}
+</script>
+
+<style>
+.page-link{
+    height: 34px;
+}
+
+.ui-timepicker-standard {
+	height: 100px;
+    font-family: Verdana,Arial,sans-serif;
+    font-size: 0.9em;
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    color: #222;
+    margin: 0;
+}
+ .ui-timepicker-container {
+    position: absolute;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.ui-timepicker {
+    box-sizing: content-box;
+    display: block;
+    height: 150px;
+    list-style: none outside none;
+    margin: 0;
+    text-align: center;
+}
+
+.ui-timepicker-viewport {
+    box-sizing: content-box;
+    display: block;
+    height: 150px;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    overflow-x: hidden; /* IE */
+}
+
+.ui-timepicker-standard {
+    /* overwrites .ui-widget */
+    font-family: Verdana,Arial,sans-serif;
+    font-size: 0.9em;
+    /* overwrites .ui-widget-content */
+    background-color: #FFF;
+    border: 1px solid #D8D8D8;
+    color: #222;
+    /* overwrites .ui-menu */
+    margin: 0;
+    padding: 2px;
+}
+.ui-timepicker-standard a {
+    color: #222;
+    display: block;
+    text-decoration: none;
+}
+.ui-timepicker-standard .ui-state-hover {
+    /* overwrites .ui-state-hover */
+    background-color: #E0ECF8;
+    font-weight: normal;
+    color: #212121;
+    border: none;
+}
+.ui-timepicker-standard .ui-menu-item {
+    /* overwrites .ui-menu and .ui-menu-item */
+    /*clear: left;
+    float: left;*/
+    margin: 0;
+    padding: 0;
+}
+
+.ui-timepicker-corners,
+.ui-timepicker-corners .ui-corner-all {
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.ui-timepicker-hidden {
+    /* overwrites .ui-helper-hidden */
+    display: none;
+}
+
+.ui-timepicker-no-scrollbar .ui-timepicker {
+    border: none;
+}
+
+</style>
+</head>
+<body>
+
+
+<c:if test="${from eq 'regist' }" >
+	<script>
+		alert("상담신청이 완료되었습니다.");
+		window.location.reload();			
+	</script>
+</c:if>
+
+
+ <section class="content" style="padding-left: 10px; padding-right: 10px; padding-top: 10px;">
+  <div class="card">
+     <div class="card-header with-border" style="display: flex; height: 50px; padding-top: 0px; border-bottom-width: 3px; border-bottom-color: #2A5F9E">
+          <h5 style="padding-top: 11px; font-weight: bold;">상담신청목록</h5>     
+          <button type="button" class="btn btn-xs btnBlue text-white" style="background-color:#2A5F9E;margin-left: 750px;margin-top: 10px;margin-bottom: -3px;">상담실 입장</button>
+     </div>
+         <div class="input-group row " style="position: unset;padding-left: 718px;font-size: 14px;padding-top: 10px;padding-right: 18px;">
+                                
+               <!-- search bar -->               
+         
+            <select class="form-control" name="searchType" id="searchType" style="font-size: 14px; width: 60px;">
+              <option value=""  ${cri.searchType eq '' ? 'selected':''}>상담종류</option>
+              <option value="일반상담"  ${cri.searchType eq '일반상담' ? 'selected':''}>일반상담</option>
+              <option value="전과상담"  ${cri.searchType eq '전과상담' ? 'selected':''}>전과상담</option>
+              <option value="자퇴상담"  ${cri.searchType eq '자퇴상담' ? 'selected':''}>자퇴상담</option>
+              <option value="복수전공상담"  ${cri.searchType eq '복수전공상담' ? 'selected':''}>복수전공상담</option>
+           </select>
+            <select class="form-control" name="searchType2" id="searchType2" style="font-size: 14px;">
+              <option value=""  ${cri.searchType2 eq '' ? 'selected':''}>상태</option>
+              <option value="수락"  ${cri.searchType2 eq '수락' ? 'selected':''}>수락</option>
+              <option value="거절"  ${cri.searchType2 eq '거절' ? 'selected':''}>거절</option>
+              <option value="대기"  ${cri.searchType2 eq '대기' ? 'selected':''}>대기</option>
+              <option value="완료"  ${cri.searchType2 eq '완료' ? 'selected':''}>완료</option>
+           </select>
+           
+           <!-- keyword -->
+           <span class="input-group-append">
+              <button class="btn text-white" type="button" 
+                    id="searchBtn" data-card-widget="search" onclick="list_go3(1);" style="background-color: #2A5F9E;width: 43px;">
+                 <i class="fa fa-fw fa-search"></i>
+              </button>
+           </span>
+        <!-- end : search bar -->      
+            </div>         
+     <div class="card-body row" style="text-align:center; padding-bottom: 0; padding-top: 10px;">
+     <div class="col-sm-12" style="height: 283px;">
+     
+
+       
+          <div class="col-sm-12" style="min-height: 220.56px;">   
+         <table class="table table-hover table-sm" style="font-size: 15px;">
+            
+            <thead>
+            <tr style="text-align: center;">
+<!--                   <th style="width: 55px;">NO</th> -->
+                  <th>상담종류</th>
+                  <th style="min-width: 429.3px;">제목</th>
+                  <th>상담일자</th>
+                  <th>상태</th>
+                  <th>상담교수</th>
+               </tr>
+         </thead>           
+              <c:forEach items="${counselList }" var="c">
+                   <tr onclick="OpenWindow('detail.do?counsel_no=${c.counsel_no}','상세보기',800,400);" style="text-align: center; font-size: 14px;">
+                   <td>${c.consl_categ_nm }</td>                          
+                   <td style="text-align: left;">
+                   <c:if test="${empty c.regist_title }">
+                   ${c.register_content }
+                   </c:if>
+                   <c:if test="${not empty c.regist_title }">
+                   ${c.regist_title }
+                   </c:if>
+                   
+                   
+                   </td>
+                   <td>
+                   <fmt:formatDate value="${c.counsel_date }" pattern="yyyy-MM-dd"/>
+                   <span> / </span>
+                   <fmt:formatDate value="${c.counsel_date }" pattern="a hh:mm"/>
+                   </td>
+                   <td>${c.status_nm }</td>                          
+                   <td>${c.name }</td>                          
+                  </tr>
+            </c:forEach>      
+             
+                 
+           </table> 
+                       </div>      
+   <div>              
+              <nav aria-label="Navigation" style="display: flex;padding-top: 10px;">
+   <ul class="pagination justify-content-center m-0" style="padding-left: 310px;">
+      <li class="page-item">
+         <a class="page-link" href="javascript:list_go3(1);">
+         <i class="fas fa-angle-double-left"></i>
+         </a>
+      </li>
+      <li class="page-item">
+         <a class="page-link" href="javascript:list_go3('${pageMaker.prev ? pageMaker.startPage-1 : cri.page}');">
+         <i class="fas fa-angle-left"></i>
+         </a>
+      </li>
+      <c:forEach var="pageNum" begin="${pageMaker.startPage }" end="${pageMaker.endPage }" >
+      <li class="page-item ${pageMaker.cri.page == pageNum?'active':''}">
+         <a class="page-link" href="javascript:list_go3('${pageNum}');" style="height: 34px;" >
+         ${pageNum }</a>
+      </li>
+      </c:forEach>
+      <li class="page-item">
+         <a class="page-link" href="javascript:list_go3('${pageMaker.next ? pageMaker.endPage+1 :cri.page}');">
+         <i class="fas fa-angle-right" ></i>
+         </a>
+      </li>
+      <li class="page-item">
+      <a class="page-link" href="javascript:list_go3('${pageMaker.realEndPage}');">
+         <i class="fas fa-angle-double-right"></i>
+      </a>
+      </li>   
+      
+   </ul>
+</nav>  
+   </div>
+               
+              
+
+            
+            </div>
+     
+     
+     
+            
+
+        </div> <!-- col-sm-12 -->
+       </div> <!-- row -->
+       
+       
+     <div class="card">
+     <div class="card-header with-border" style="display: flex; height: 50px; padding-top: 0px; border-bottom-width: 3px; border-bottom-color: #2A5F9E">
+          <h5 style="padding-top: 11px; font-weight: bold;">상담신청</h5>     
+     </div>
+                                
+     <div class="card-body row" style="text-align:center;padding-bottom: 0;padding-top: 10px;padding-left: 60px;">
+	 <form role="form" name="registForm" id="registForm" action="management_st/modify" method="post">
+
+     <div class="col-sm-12 row" style="padding-bottom: 10px;">
+     
+         <div class="col-sm-9 row">
+	         <label for="regist_title">제목</label>
+	         <input type="text" class="form-control" name="regist_title" id="regist_title" value="" >
+         </div>
+         
+         <div class="col-sm-3 row" style="padding-left: 20px;">
+	         <label for="consl_categ_nm">상담종류</label>
+        <select class="form-control" name="consl_categ_nm" id="consl_categ_nm" style="font-size: 14p;">
+          <option value="">구분</option>
+          <option value="일반상담">일반상담</option>
+          <option value="전과상담">전과상담</option>
+          <option value="자퇴상담">자퇴상담</option>
+          <option value="복수전공상담">복수전공상담</option>
+        </select>
+         </div>                
+     </div>
+
+     <div class="col-sm-12 row" style="padding-bottom: 20px;">
+     
+         <div class="col-sm-9 row">
+	         <label for="register_content">신청내용</label>
+			<textarea class="form-control" id="register_content" name="register_content" rows="3" style="height: 300px;"></textarea>
+         </div>
+         
+         <div class="col-sm-3 row" style="padding-top: 30px; padding-left: 20px; padding-bottom: 10px; height: 140px;">
+         
+            <label for="">예약날짜</label>
+        	<input class="form-control date" type="date" name="date1">
+         
+	     <!--  <label for="searchType" style="padding-top: 20px;">시간대 선택</label> -->
+                <div class="bootstrap-timepicker">
+                  <div class="">
+                    <label  style="float: left; padding-top: 10px;">예약시간</label>
+				
+				        <div class="input-group bootstrap-timepicker timepicker">
+				            <input id="timepicker1" type="text" class="form-control input-small" name="time1" style="border-radius: 4px;" autocomplete="off">
+				            <p class="help-block text-danger"></p>
+				        </div>
+                    <!-- /.input group -->
+                  </div>
+                  <!-- /.form group -->
+                </div>
+
+        
+         <button type="button" onclick="Register();" class="btn btn-sm btnBlue text-white" style="background-color:#2A5F9E;margin-left: 70px;margin-top: 20px;">상담신청</button>              
+         </div>  
+     </div>
+  
+      </form>
+      </div> <!-- col-sm-12 -->
+      </div> <!-- card -->
+
+<form id="jobForm3">
+    <input type='hidden' name="page" value="" />
+    <input type='hidden' name="perPageNum" value="${pageMaker.cri.perPageNum }"/>
+   <input type='hidden' name="searchType" value="" />
+   <input type='hidden' name="searchType2" value="" />
+   <input type='hidden' name="keyword" value="" />
+</form> 
+   <!-- pagenation -->
+                
+
+   
+</section>
+
+
+
+<script>
+function Register(){
+	var form = document.registForm;
+	console.log(form);
+	if(form.regist_title.value==""){
+		alert("제목은 필수입니다.");
+		return;
+	}
+	
+	form.submit();
+}
+
+
+</script>
+<script>
+$('#timepicker1').timepicker({
+    defaultTime: 'current',
+    minTime: '09:00:00', // 11:45:00 AM,
+    maxHour: 17,
+    maxMinutes: 30,
+    minuteStep: 1
+    
+});
+
+
+</script>
+
+</body>

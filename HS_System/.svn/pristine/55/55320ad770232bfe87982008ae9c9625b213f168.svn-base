@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Curriculum-Mapper">
+	<sql id="search">
+		<if test="class_score != null and class_score != ''">
+			and class_score = #{class_score}
+		</if>
+		<if test="lecture_semester != null and lecture_semester !=''">
+			and lecture_semester = #{lecture_semester}
+		</if>
+		<if test="grade !=null and grade!=''">
+			and grade = #{grade}
+		</if>
+		<if test="class_no != null and class_no !=''">
+			and class_no = #{class_no}
+		</if>
+		<if test="class_nm != null and class_nm !=''">
+			and class_nm like '%'||#{class_nm}||'%'
+		</if>
+		<if test="class_type_cd !=null and class_type_cd !=''">
+			and class_type_cd = #{class_type_cd}
+		</if>
+		<if test="dept_cd != null and dept_cd != ''">
+			and dept_cd = #{dept_cd}
+		</if>
+	</sql>
+	
+	<sql id="openedsearch">
+		<if test="class_score != null and class_score != ''">
+			and class_grade = #{class_score}
+		</if>
+		<if test="lecture_semester != null and lecture_semester !=''">
+			and lecture_semester = #{lecture_semester}
+		</if>
+		<if test="grade !=null and grade!=''">
+			and class_year = #{grade}
+		</if>
+		<if test="class_no != null and class_no !=''">
+			and class_no = #{class_no}
+		</if>
+		<if test="class_nm != null and class_nm !=''">
+			and class_name like '%'||#{class_nm}||'%'
+		</if>
+		<if test="class_type_cd !=null and class_type_cd !=''">
+			and class_type_type = #{class_type_cd}
+		</if>
+		<if test="dept_cd != null and dept_cd != ''">
+			and dept_no = #{dept_cd}
+		</if>
+		<if test="status_cd != null and status_cd != ''">
+			and a.status_cd = #{status_cd}
+		</if>
+	</sql>
+	
+	<sql id="currisearch">
+		<if test="class_score != null and class_score != ''">
+			and class_score = #{class_score}
+		</if>
+		<if test="grade !=null and grade!=''">
+			and grade = #{grade}
+		</if>
+		<if test="class_no != null and class_no !=''">
+			and class_no = #{class_no}
+		</if>
+		<if test="class_nm != null and class_nm !=''">
+			and class_nm like '%'||#{class_nm}||'%'
+		</if>
+		<if test="class_type_cd !=null and class_type_cd !=''">
+			and class_type_cd = #{class_type_cd}
+		</if>
+		<if test="dept_cd != null and dept_cd != ''">
+			and dept_cd = #{dept_cd}
+		</if>
+	</sql>
+	
+	<select id="selectCurriculumListByDeptCd" resultType="curriculum">
+		<include refid="Common-Mapper.PageHeader" />
+		select 
+		class_no, class_nm,class_score, grade ,dept_cd, b.status_nm
+		from curriculum a, common_code_detail b
+		where 1=1 and a.class_type_cd = b.status_cd
+		<include refid="currisearch" />
+		 order by class_no
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+	
+	<select id="selectNotOpenCurriculumBySemester" resultType="curriculum">
+		<include refid="Common-Mapper.PageHeader" />
+		select class_no, class_nm  from curriculum 
+		 where class_no in(
+		       select class_no from unopend_curriculum where
+		       1=1
+		<include refid="search" />
+		)order by class_no
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+	
+	<select id="selectLecture" resultType="curriculum">
+		<include refid="Common-Mapper.PageHeader" />
+		select class_no, class_name as class_nm, class_type, status_nm 
+		  from lecture a, common_code_detail b 
+		 where lecture_semester = #{lecture_semester} 
+		   and a.status_cd = b.status_cd
+		<include refid="openedsearch" />
+		order by class_no
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+	
+	<sql id="registSearch">
+		<if test="lecture_semester != null and lecture_semester != ''">
+			and lecture_semester = #{lecture_semester}
+		</if>
+		<if test="dept_cd != null and dept_cd != ''">
+			and dept_no = #{dept_cd}		
+		</if>
+		<if test="grade != null and grade != ''">
+			and class_year = #{grade}
+		</if>
+		<if test="class_type_cd != null and class_type_cd != ''">
+			and class_type = (select status_nm from common_code_detail c where c.status_cd = #{class_type_cd})
+		</if>
+		<if test="status_cd != null and status_cd != ''">
+			and a.status_cd = #{status_cd}
+		</if>
+		<if test="dept_nm != null and dept_nm != ''">
+			and dept_name like '%'||#{dept_nm}||'%'		
+		</if>
+		<if test="class_nm != null and class_nm !=''">
+			and class_name like '%'||#{class_nm}||'%'
+		</if>
+		
+	</sql>
+	
+	<select id="selectRegisteCurriculumAcademic" resultType="lecture">
+		<include refid="Common-Mapper.PageHeader" />
+		select class_no, dept_name, class_year, class_name, class_type,class_grade, b.status_nm, lecture_semester
+		  from lecture a, common_code_detail b 
+		 where a.status_cd = b.status_cd
+		 <include refid="registSearch"/>
+		  order by class_no	
+		<include refid="Common-Mapper.PageFooter"/>
+	</select>
+	
+	
+	<update id="insertUponpenedCurriculum">
+		insert into unopend_curriculum values (#{class_no}, #{lecture_semester})
+	</update>
+	
+	<update id="deleteUnopenedCurriculum">
+		delete from unopend_curriculum where class_no = #{class_no} and lecture_semester=#{lecture_semester}
+	</update>
+	
+	<update id="insertOpenedCurriculum">
+		insert into lecture (lecture_semester,class_no,class_name,class_grade,class_year,dept_name,class_type,status_cd,dept_no) 
+		values
+		(#{lecture_semester},#{class_no},#{class_name},#{class_grade},#{class_year},#{dept_name},#{class_type},'CCDR001',#{dept_no})
+	</update>
+	
+	<select id="selectRegistCurriculumAcademicDetail" resultType="lecture">
+	<![CDATA[
+		select a.*, b.status_nm,
+		(select count(*) from lecture where lecture_semester < #{lecture_semester} and class_no = #{class_no}) as before_open 
+		from lecture a, common_code_detail b 
+		where 
+		1=1
+		and class_no = #{class_no} and lecture_semester = #{lecture_semester}
+		and a.status_cd = b.status_cd
+	]]>
+	</select>
+	
+	<update id="updateOpenCurriculumByAcademic">
+		update lecture set status_cd = #{status_cd} where class_no = #{class_no} and lecture_semester = #{lecture_semester}
+	</update>
+</mapper>

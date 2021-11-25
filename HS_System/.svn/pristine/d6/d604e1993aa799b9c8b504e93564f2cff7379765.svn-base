@@ -1,0 +1,37 @@
+package kr.ac.hs.dto.tuition;
+
+import java.util.Date;
+
+public class TuitionVO {
+	
+	private Date semester;
+	private String StudentNo;
+	private String tutionAmount;
+	private String paymentAmount;
+	
+	public Date getSemester() {
+		return semester;
+	}
+	public void setSemester(Date semester) {
+		this.semester = semester;
+	}
+	public String getStudentNo() {
+		return StudentNo;
+	}
+	public void setStudentNo(String studentNo) {
+		StudentNo = studentNo;
+	}
+	public String getTutionAmount() {
+		return tutionAmount;
+	}
+	public void setTutionAmount(String tutionAmount) {
+		this.tutionAmount = tutionAmount;
+	}
+	public String getPaymentAmount() {
+		return paymentAmount;
+	}
+	public void setPaymentAmount(String paymentAmount) {
+		this.paymentAmount = paymentAmount;
+	}
+	
+}

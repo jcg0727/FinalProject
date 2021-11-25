@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="DepartmentChange-Mapper">
+	
+	<sql id="search">	
+		<if test="belong_dept_cd != null">
+			and belong_dept_cd = #{belong_dept_cd}
+			and regexp_like (status_cd, 'CCDH001|CCDH002|CCDH003|CCDH006')
+		</if>
+		<if test="apply_dept_cd != null">
+			and apply_dept_cd = #{apply_dept_cd}
+			and regexp_like (status_cd, 'CCDH003|CCDH004|CCDH005|CCDH006')
+		</if>
+		<if test="cri != null">
+			and status_cd like '%'||#{cri.searchType}||'%'
+			and student_nm like '%'||#{cri.keyword}||'%'
+		</if>     
+	</sql>	
+	<select id="selectDepartmentChangeByStundentNO" resultType="DepChange">
+		select row_number() over(order by register_date desc) as no, a.*  from dept_change a where student_no = #{student_no} order by register_date desc
+	</select>
+	
+	<select id="selectDepartmentChangeByDepartmentNO" resultType="DepChange">
+		select row_number() over(order by a.register_date desc) as no, a.*  
+		from dept_change a 
+		where 
+		1=1
+		<include refid="search"/>	
+		order by register_date desc
+	</select>
+	
+	<select id="selectDepartmentChangeByApplyDepartmentNO" resultType="DepChange">
+		select *  
+		from dept_change 
+		where 
+		1=1
+		<include refid="search"/>
+		order by register_date desc
+	</select>
+	
+	<select id="seletDetailByStudentNoAndRgisterDate" resultType="DepChange">
+		select
+		    a.student_no,
+		    a.register_date,
+		    a.register_reason,
+		    a.status_cd,
+		    a.apply_dept_cd,
+		    a.apply_dept_nm,
+		    a.belong_dept_cd,
+		    a.belong_dept_nm,
+		    a.status_nm,
+		    a.counsel_status_nm,
+		    a.counsel_no,
+		    a.student_nm,
+		    b.attach_no
+		from
+		    dept_change_attachment b,
+		    dept_change a
+		where
+		    a.student_no = b.student_no
+		and a.register_date = b.register_date
+		and a.student_no = #{student_no} and to_char(a.register_date,'yyyy/MM/dd') = to_char(to_date(#{register_date}, 'yyyy/MM/dd HH24:MI'), 'yyyy/MM/dd')
+	</select>
+	
+	<update id="insertDepartmentChange">
+		insert into dept_change (
+			student_no,
+			register_date,
+			register_reason,
+			status_cd,
+			status_nm,
+			apply_dept_cd,
+			apply_dept_nm,
+			belong_dept_cd,
+			belong_dept_nm,
+			counsel_status_nm,
+			counsel_no,
+			student_nm
+		) values (
+			#{student_no},
+			sysdate,
+			#{register_reason},
+			'CCDH001',
+			'신청완료',
+			#{apply_dept_cd},
+			#{apply_dept_nm},
+			#{belong_dept_cd},
+			#{belong_dept_nm},
+			'대기',			
+			#{counsel_no},
+			(select name from account where account_no = (select account_no from student where student_no = #{student_no}))
+		)
+	</update>
+	
+	<update id="updateDepartmentChangeOfStatus">
+		update dept_change set status_cd = #{status_cd}, status_nm = #{status_nm} 
+		where student_no=#{student_no} 
+		and to_char(register_date,'yyyyMMddHHmi')=to_char(#{register_date},'yyyyMMddHHmi')
+	</update>
+	
+	<update id="deleteDepartmentChange">
+		delete from dept_change where student_no=#{student_no} and to_char(register_date, 'yyyyMMdd HH:mm')=to_char(#{register_date}, 'yyyyMMdd HH:mm')
+	</update>
+	
+	<update id="insertDepartmentChangeAttach">
+		insert into dept_change_attachment (
+			student_no,
+			register_date,
+			attach_no,
+			delete_whether		
+		)
+		values (
+			#{student_no},
+			sysdate,
+			#{attach_no},
+			#{delete_whether}
+		) 
+	</update>
+
+	<select id="selectCountDepartmentChange" resultType="int">
+		select count(*) from dept_change
+		where 1=1
+		<include refid="search"/>
+	</select>
+	
+	<update id="updateDpartmentChangeByStaffForTransfer">
+		update dept_change set counsel_no = #{counsel_no}, counsel_status_nm = #{counsel_status_nm}
+		where student_no=#{student_no} and to_char(register_date, 'yyyyMMdd HH:mm')=to_char(#{register_date}, 'yyyyMMdd HH:mm')
+	</update>
+
+</mapper>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AcademicCalendar-Mapper">
+	<select id="selectAcademicCalenderOnlyAcademicSchedule" resultType="academicCalender">
+		select * from academic_calendar
+		where 1=1 
+		and status_cd = 'CCDX001' 
+		and substr(cal_semester,0,4) = to_char(sysdate, 'yyyy')
+	</select>
+</mapper>

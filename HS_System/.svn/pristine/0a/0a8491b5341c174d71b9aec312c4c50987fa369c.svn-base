@@ -1,0 +1,69 @@
+package kr.ac.hs.dao;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.SqlSession;
+
+import kr.ac.hs.dto.AccountVO;
+
+public class AccountDAOImpl implements AccountDAO {
+
+	private SqlSession session;
+
+	public void setSqlSession(SqlSession session) {
+		this.session = session;
+	}
+
+	@Override
+	public void updateSecurityLevel(AccountVO account) throws SQLException {
+		session.update("Account-Mapper.updateSecurityLevel", account);
+
+	}
+
+	@Override
+	public AccountVO selectSecurityLevel(AccountVO account) throws SQLException {
+
+		return session.selectOne("Account-Mapper.selectSecurityLevel", account);
+	}
+
+	// 비밀번호변경
+	@Override
+	public void updatePw(AccountVO account) throws SQLException {
+		session.update("Account-Mapper.updatePw", account);
+	}
+
+	// 아이디찾기 - 학생/교직원/교수별
+	@Override
+	public AccountVO selectStuId(AccountVO account) throws SQLException {
+
+		return session.selectOne("Account-Mapper.selectStuId", account);
+	}
+
+	@Override
+	public List<AccountVO> selectStaffId(String name, String reg_no) throws SQLException {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+
+		dataMap.put("reg_no", reg_no);
+		dataMap.put("name", name);
+
+		List<AccountVO> staffList = session.selectList("Account-Mapper.selectStaffId", dataMap);
+
+		return staffList;
+	}
+
+	@Override
+	public List<AccountVO> selectProId(String name, String reg_no) throws SQLException {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+
+		dataMap.put("reg_no", reg_no);
+		dataMap.put("name", name);
+
+		List<AccountVO> proList = session.selectList("Account-Mapper.selectProId", dataMap);
+
+		return proList;
+	}
+
+}

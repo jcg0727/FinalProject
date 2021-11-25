@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<head>
+  <meta charset="utf-8">
+  <title>H.S. 화상상담</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="shortcut icon" href="/demos/logo.png">
+  <link rel="stylesheet" href="./demos/stylesheet.css">
+  <script src="./demos/menu.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+  <style>
+
+/* BASIC */
+
+html {
+  background-color: #56baed;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  height: 100vh;
+}
+
+a {
+  color: #92badd;
+  display:inline-block;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+h2 {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display:inline-block;
+  margin: 40px 8px 10px 8px; 
+  color: #cccccc;
+}
+
+
+
+/* STRUCTURE */
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column; 
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+  padding: 20px;
+}
+
+#formContent {
+  -webkit-border-radius: 10px 10px 10px 10px;
+  border-radius: 10px 10px 10px 10px;
+  background: #fff;
+  padding: 30px;
+  width: 90%;
+  max-width: 800px;
+  position: relative;
+  padding: 0px;
+  -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+#formFooter {
+  background-color: #f6f6f6;
+  border-top: 1px solid #dce8f1;
+  padding: 25px;
+  text-align: center;
+  -webkit-border-radius: 0 0 10px 10px;
+  border-radius: 0 0 10px 10px;
+}
+
+
+
+/* TABS */
+
+h2.inactive {
+  color: #cccccc;
+}
+
+h2.active {
+  color: #0d0d0d;
+  border-bottom: 2px solid #5fbae9;
+}
+
+
+
+/* FORM TYPOGRAPHY*/
+
+input[type=button], input[type=submit], input[type=reset]  {
+  background-color: #56baed;
+  border: none;
+  color: white;
+  padding: 15px 80px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  text-transform: uppercase;
+  font-size: 13px;
+  -webkit-box-shadow: 0 10px 30px 0 rgba(95,186,233,0.4);
+  box-shadow: 0 10px 30px 0 rgba(95,186,233,0.4);
+  -webkit-border-radius: 5px 5px 5px 5px;
+  border-radius: 5px 5px 5px 5px;
+  margin: 5px 20px 40px 20px;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -ms-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover  {
+  background-color: #39ace7;
+}
+
+input[type=button]:active, input[type=submit]:active, input[type=reset]:active  {
+  -moz-transform: scale(0.95);
+  -webkit-transform: scale(0.95);
+  -o-transform: scale(0.95);
+  -ms-transform: scale(0.95);
+  transform: scale(0.95);
+}
+
+input[type=text] {
+  background-color: #f6f6f6;
+  border: none;
+  color: #0d0d0d;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 5px;
+  width: 85%;
+  border: 2px solid #f6f6f6;
+  -webkit-transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  -ms-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+  -webkit-border-radius: 5px 5px 5px 5px;
+  border-radius: 5px 5px 5px 5px;
+}
+
+input[type=text]:focus {
+  background-color: #fff;
+  border-bottom: 2px solid #5fbae9;
+}
+
+input[type=text]:placeholder {
+  color: #cccccc;
+}
+
+
+
+/* ANIMATIONS */
+
+/* Simple CSS3 Fade-in-down Animation */
+.fadeInDown {
+  -webkit-animation-name: fadeInDown;
+  animation-name: fadeInDown;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+@-webkit-keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+/* Simple CSS3 Fade-in Animation */
+@-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.fadeIn {
+  opacity:0;
+  -webkit-animation:fadeIn ease-in 1;
+  -moz-animation:fadeIn ease-in 1;
+  animation:fadeIn ease-in 1;
+
+  -webkit-animation-fill-mode:forwards;
+  -moz-animation-fill-mode:forwards;
+  animation-fill-mode:forwards;
+
+  -webkit-animation-duration:1s;
+  -moz-animation-duration:1s;
+  animation-duration:1s;
+}
+
+.fadeIn.first {
+  -webkit-animation-delay: 0.4s;
+  -moz-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+}
+
+.fadeIn.second {
+  -webkit-animation-delay: 0.6s;
+  -moz-animation-delay: 0.6s;
+  animation-delay: 0.6s;
+}
+
+.fadeIn.third {
+  -webkit-animation-delay: 0.8s;
+  -moz-animation-delay: 0.8s;
+  animation-delay: 0.8s;
+}
+
+.fadeIn.fourth {
+  -webkit-animation-delay: 1s;
+  -moz-animation-delay: 1s;
+  animation-delay: 1s;
+}
+
+/* Simple CSS3 Fade-in Animation */
+.underlineHover:after {
+  display: block;
+  left: 0;
+  bottom: -10px;
+  width: 0;
+  height: 2px;
+  background-color: #56baed;
+  content: "";
+  transition: width 0.2s;
+}
+
+.underlineHover:hover {
+  color: #0d0d0d;
+}
+
+.underlineHover:hover:after{
+  width: 100%;
+}
+
+h1{
+    color:#60a0ff;
+}
+
+/* OTHERS */
+
+*:focus {
+    outline: none;
+} 
+
+#icon {
+  width:30%;
+}
+
+video {
+	height: 250px;
+}
+  </style>
+ 
+</head>
+<body>
+
+<!------ Include the above in your HEAD tag ---------->
+
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+  <h1>
+	H.S. 화상상담
+  </h1>
+
+  <section class="make-center">
+    <div>
+      <label><input type="checkbox" id="record-entire-conference"> 상담 저장하시겠습니까?</label>
+      <span id="recording-status" style="display: none;"></span>
+      <button id="btn-stop-recording" style="display: none;">저장 종료</button>
+      <br><br>
+      <input type="text" id="room-id" value="" autocorrect=off autocapitalize=off size=20 placeholder="회의 ID를 입력해주세요"><br><br>
+      <form name="formid" action="http://localhost/hs/counsel/updateCounselContent" method="post">
+      <input type="hidden" id="counsel_no" name="counsel_no" value=""/> 
+      <button id="open-room" style="background-color: #2A5F9E;">상담 생성</button>
+      <button id="join-room">상담 참가</button>
+      <button id="close-room" style="background-color: #B94040;">상담 종료</button>
+    </div>
+    <div id="videos-container" style="margin: 20px 0;"></div>
+	</section>
+	<section>
+	
+	<div class="card" id="counsel" style="display: none;">
+              <div class="card-header" style="background-color: #2A5F9E;color: white;">
+                <h3 class="card-title">상담일지</h3>
+              </div>
+              <!-- /.card-header -->
+              
+              <div class="card-body table-responsive p-0">
+                <table class="table text-nowrap" style="text-align: center;">
+                  <thead>
+                    <tr style="background-color: #e3f2fd">
+                      <th style="width: 242px;">학생</th>
+                      <th style="width: 242px;">교수</th>
+                      <th style="width: 242px;">상담 일자</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" name="studentName" value="김민석" readonly="readonly"/> </td>
+                      <td><input type="text" name="professorName" value="박병주" readonly="readonly"/> </td>
+                      <td><input type="text" id="time" name ="time" value="" readonly="readonly"/></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table class="table text-nowrap" style="text-align: center;">
+                  <thead>
+                    <tr style="background-color: #e3f2fd">
+                      <th>상담내용</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="height: auto; text-align: left;"><textarea rows="4" cols="95" style="border: none;" name="counsel_content"> </textarea> </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <button type="submit" class="btn btnBlue btn-sm" name="status_cd" id="ok" value="CCDF004" >승인</button> <button type="submit" class="btn btnRed btn-sm" name="status_cd" id="no" value="CCDF007">반려</button>
+                </form>
+              </div>
+              <!-- /.card-body -->
+            </div>
+    <div id="room-urls" style="color:white; text-align: center;display: none;background: #F1EDED;"></div>
+	</section>
+  </div>
+</div>
+
+
+<script src="./dist/RTCMultiConnection.min.js"></script>
+<script src="./node_modules/webrtc-adapter/out/adapter.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<!-- custom layout for HTML5 audio/video elements -->
+<link rel="stylesheet" href="./dev/getHTMLMediaElement.css">
+<script src="./dev/getHTMLMediaElement.js"></script>
+
+<script src="./node_modules/recordrtc/RecordRTC.js"></script>
+<script>
+document.getElementById('ok').onclick = function() {
+alert("승인되었습니다.")
+document.getElementById('formid').submit();
+}
+document.getElementById('no').onclick = function() {
+alert("반려되었습니다.")
+document.getElementById('formid').submit();
+}
+// 	function ok(){
+// 		alert("승인되었습니다.").
+// 		document.getElementById('formid').submit();
+			
+// 	}
+// 	function no(){
+// 		alert("반려되었습니다.").
+// 		document.getElementById('formid').submit();
+			
+// 	}
+</script>
+
+<script>
+// ......................................................
+// .......................UI Code........................
+// ......................................................
+
+document.getElementById('close-room').onclick = function() {
+    confirm("상담을 종료하고 창을 닫으시겠습니까?")
+    if(confirm){
+        connection.getAllParticipants().forEach(function(pid) {
+            connection.disconnectWith(pid);
+        });
+//         // stop all local cameras
+        connection.attachStreams.forEach(function(localStream) {
+            localStream.stop();
+        });
+        
+    	connection.closeSocket();
+    	window.close();	
+    	
+    }
+}
+
+
+document.getElementById('open-room').onclick = function() {
+    disableInputButtons();
+    connection.open(document.getElementById('room-id').value, function(isRoomOpened, roomid, error) {
+        if(isRoomOpened === true) {
+          showRoomURL(connection.sessionid);
+        }
+        else {
+          disableInputButtons(true);
+          if(error === 'Room not available') {
+            alert('이미 존재하는 방번호입니다.');
+            return;
+          }
+          alert(error);
+        }
+    });
+};
+
+document.getElementById('join-room').onclick = function() {
+    disableInputButtons();
+    connection.join(document.getElementById('room-id').value, function(isJoinedRoom, roomid, error) {
+      if (error) {
+            disableInputButtons(true);
+            if(error === 'Room not available') {
+              alert('존재하지 않는 방번호 입니다.');
+              return;
+            }
+            alert(error);
+        }
+    });
+};
+
+/* document.getElementById('open-or-join-room').onclick = function() {
+    disableInputButtons();
+    connection.openOrJoin(document.getElementById('room-id').value, function(isRoomExist, roomid, error) {
+        if(error) {
+          disableInputButtons(true);
+          alert(error);
+        }
+        else if (connection.isInitiator === true) {
+            // if room doesn't exist, it means that current user will create the room
+            showRoomURL(roomid);
+        }
+    });
+}; */
+
+// ......................................................
+// ..................RTCMultiConnection Code.............
+// ......................................................
+
+var connection = new RTCMultiConnection();
+
+// by default, socket.io server is assumed to be deployed on your own URL
+connection.socketURL = '/';
+
+// comment-out below line if you do not have your own socket.io server
+// connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
+
+connection.socketMessageEvent = 'video-conference-demo';
+
+connection.session = {
+    audio: true,
+    video: true
+};
+
+connection.sdpConstraints.mandatory = {
+    OfferToReceiveAudio: true,
+    OfferToReceiveVideo: true
+};
+
+// STAR_FIX_VIDEO_AUTO_PAUSE_ISSUES
+// via: https://github.com/muaz-khan/RTCMultiConnection/issues/778#issuecomment-524853468
+var bitrates = 512;
+var resolutions = 'Ultra-HD';
+var videoConstraints = {};
+
+if (resolutions == 'HD') {
+    videoConstraints = {
+        width: {
+            ideal: 1280
+        },
+        height: {
+            ideal: 720
+        },
+        frameRate: 30
+    };
+}
+
+if (resolutions == 'Ultra-HD') {
+    videoConstraints = {
+        width: {
+            ideal: 1920
+        },
+        height: {
+            ideal: 1080
+        },
+        frameRate: 30
+    };
+}
+
+connection.mediaConstraints = {
+    video: videoConstraints,
+    audio: true
+};
+
+var CodecsHandler = connection.CodecsHandler;
+
+connection.processSdp = function(sdp) {
+    var codecs = 'vp8';
+    
+    if (codecs.length) {
+        sdp = CodecsHandler.preferCodec(sdp, codecs.toLowerCase());
+    }
+
+    if (resolutions == 'HD') {
+        sdp = CodecsHandler.setApplicationSpecificBandwidth(sdp, {
+            audio: 128,
+            video: bitrates,
+            screen: bitrates
+        });
+
+        sdp = CodecsHandler.setVideoBitrates(sdp, {
+            min: bitrates * 8 * 1024,
+            max: bitrates * 8 * 1024,
+        });
+    }
+
+    if (resolutions == 'Ultra-HD') {
+        sdp = CodecsHandler.setApplicationSpecificBandwidth(sdp, {
+            audio: 128,
+            video: bitrates,
+            screen: bitrates
+        });
+
+        sdp = CodecsHandler.setVideoBitrates(sdp, {
+            min: bitrates * 8 * 1024,
+            max: bitrates * 8 * 1024,
+        });
+    }
+
+    return sdp;
+};
+// END_FIX_VIDEO_AUTO_PAUSE_ISSUES
+
+// https://www.rtcmulticonnection.org/docs/iceServers/
+// use your own TURN-server here!
+connection.iceServers = [{
+    'urls': [
+        'stun:stun.l.google.com:19302',
+        'stun:stun1.l.google.com:19302',
+        'stun:stun2.l.google.com:19302',
+        'stun:stun.l.google.com:19302?transport=udp',
+    ]
+}];
+
+connection.videosContainer = document.getElementById('videos-container');
+connection.onstream = function(event) {
+    var existing = document.getElementById(event.streamid);
+    if(existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
+    }
+
+    event.mediaElement.removeAttribute('src');
+    event.mediaElement.removeAttribute('srcObject');
+    event.mediaElement.muted = true;
+    event.mediaElement.volume = 0;
+
+    var video = document.createElement('video');
+
+    try {
+        video.setAttributeNode(document.createAttribute('autoplay'));
+        video.setAttributeNode(document.createAttribute('playsinline'));
+    } catch (e) {
+        video.setAttribute('autoplay', true);
+        video.setAttribute('playsinline', true);
+    }
+
+    if(event.type === 'local') {
+      video.volume = 0;
+      try {
+          video.setAttributeNode(document.createAttribute('muted'));
+      } catch (e) {
+          video.setAttribute('muted', true);
+      }
+    }
+    video.srcObject = event.stream;
+
+    var width = parseInt(connection.videosContainer.clientWidth / 3) - 20;
+    var mediaElement = getHTMLMediaElement(video, {
+        title: event.title, 
+        buttons: ['full-screen'],
+        width: width,
+        showOnMouseEnter: false
+    });
+
+    connection.videosContainer.appendChild(mediaElement);
+
+    setTimeout(function() {
+        mediaElement.media.play();
+    }, 5000);
+
+    mediaElement.id = event.streamid;
+
+    // to keep room-id in cache
+    localStorage.setItem(connection.socketMessageEvent, connection.sessionid);
+
+    chkRecordConference.parentNode.style.display = 'none';
+
+    if(chkRecordConference.checked === true) {
+      btnStopRecording.style.display = 'inline-block';
+      recordingStatus.style.display = 'inline-block';
+
+      var recorder = connection.recorder;
+      if(!recorder) {
+        recorder = RecordRTC([event.stream], {
+          type: 'video'
+        });
+        recorder.startRecording();
+        connection.recorder = recorder;
+      }
+      else {
+        recorder.getInternalRecorder().addStreams([event.stream]);
+      }
+
+      if(!connection.recorder.streams) {
+        connection.recorder.streams = [];
+      }
+
+      connection.recorder.streams.push(event.stream);
+      recordingStatus.innerHTML = '녹화중  : ' + connection.recorder.streams.length + ' 명';
+    }
+
+    if(event.type === 'local') {
+      connection.socket.on('disconnect', function() {
+        if(!connection.getAllParticipants().length) {
+          location.reload();
+        }
+      });
+    }
+};
+
+var recordingStatus = document.getElementById('recording-status');
+var chkRecordConference = document.getElementById('record-entire-conference');
+var btnStopRecording = document.getElementById('btn-stop-recording');
+btnStopRecording.onclick = function() {
+  var recorder = connection.recorder;
+  if(!recorder) return alert('No recorder found.');
+  recorder.stopRecording(function() {
+    var blob = recorder.getBlob();
+    invokeSaveAsDialog(blob);
+
+    connection.recorder = null;
+    btnStopRecording.style.display = 'none';
+    recordingStatus.style.display = 'none';
+    chkRecordConference.parentNode.style.display = 'inline-block';
+  });
+};
+
+connection.onstreamended = function(event) {
+    var mediaElement = document.getElementById(event.streamid);
+    if (mediaElement) {
+        mediaElement.parentNode.removeChild(mediaElement);
+    }
+};
+
+connection.onMediaError = function(e) {
+    if (e.message === 'Concurrent mic process limit.') {
+        if (DetectRTC.audioInputDevices.length <= 1) {
+            alert('Please select external microphone. Check github issue number 483.');
+            return;
+        }
+
+        var secondaryMic = DetectRTC.audioInputDevices[1].deviceId;
+        connection.mediaConstraints.audio = {
+            deviceId: secondaryMic
+        };
+
+        connection.join(connection.sessionid);
+    }
+};
+
+// ..................................
+// ALL below scripts are redundant!!!
+// ..................................
+
+function disableInputButtons(enable) {
+    document.getElementById('room-id').onkeyup();
+
+    //document.getElementById('open-or-join-room').disabled = !enable;
+    document.getElementById('open-room').disabled = !enable;
+    document.getElementById('join-room').disabled = !enable;
+    document.getElementById('room-id').disabled = !enable;
+}
+
+// ......................................................
+// ......................Handling Room-ID................
+// ......................................................
+
+function showRoomURL(roomid) {
+    var roomHashURL = '#' + roomid;
+    var roomQueryStringURL = '?roomid=' + roomid;
+
+    var html = '<h2>H.S. 화상 URL :</h2>';
+
+    html += '<a href="' + roomHashURL + '" target="_blank">' + roomHashURL + '</a>';
+
+    var roomURLsDiv = document.getElementById('room-urls');
+    roomURLsDiv.innerHTML = html;
+
+    roomURLsDiv.style.display = 'block';
+    
+    var counsel = document.getElementById('counsel');
+    counsel.style.display = 'block';
+}
+
+(function() {
+    var params = {},
+        r = /([^&=]+)=?([^&]*)/g;
+
+    function d(s) {
+        return decodeURIComponent(s.replace(/\+/g, ' '));
+    }
+    var match, search = window.location.search;
+    while (match = r.exec(search.substring(1)))
+        params[d(match[1])] = d(match[2]);
+    window.params = params;
+})();
+
+var roomid = '';
+if (localStorage.getItem(connection.socketMessageEvent)) {
+    roomid = localStorage.getItem(connection.socketMessageEvent);
+} else {
+    roomid = connection.token();
+}
+
+var txtRoomId = document.getElementById('room-id');
+/* txtRoomId.value = roomid; */
+txtRoomId.onkeyup = txtRoomId.oninput = txtRoomId.onpaste = function() {
+    localStorage.setItem(connection.socketMessageEvent, document.getElementById('room-id').value);
+};
+
+var hashString = location.hash.replace('#', '');
+if (hashString.length && hashString.indexOf('comment-') == 0) {
+    hashString = '';
+}
+
+var roomid = params.roo
+if (!roomid && hashString.length) {
+    roomid = hashString;
+}
+
+if (roomid && roomid.length) {
+    document.getElementById('room-id').value = roomid;
+    localStorage.setItem(connection.socketMessageEvent, roomid);
+
+    // auto-join-room
+    (function reCheckRoomPresence() {
+        connection.checkPresence(roomid, function(isRoomExist) {
+            if (isRoomExist) {
+                connection.join(roomid);
+                return;
+            }
+
+            setTimeout(reCheckRoomPresence, 5000);
+        });
+    })();
+
+    disableInputButtons();
+}
+
+// detect 2G
+if(navigator.connection &&
+   navigator.connection.type === 'cellular' &&
+   navigator.connection.downlinkMax <= 0.115) {
+  alert('2G is not supported. Please use a better internet service.');
+}
+</script>
+
+  <footer>
+    <small id="send-message"></small>
+  </footer>
+
+  <script src="https://www.webrtc-experiment.com/common.js"></script>
+   <script>
+  var today = new Date();
+
+  var year = today.getFullYear();
+  var month = ('0' + (today.getMonth() + 1)).slice(-2);
+  var day = ('0' + today.getDate()).slice(-2);
+  var hours = ('0' + today.getHours()).slice(-2); 
+  var minutes = ('0' + today.getMinutes()).slice(-2);
+  
+  var dateString = year + '-' + month  + '-' + day;
+  document.getElementById("time").value = dateString;
+  </script>
+  
+  <script>
+  function getParameterByName(name) {
+	    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+	    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+	        results = regex.exec(location.search);
+	    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	}
+  
+ 	 var counsel = getParameterByName("counsel_no")
+
+  	document.getElementById("counsel_no").value = counsel ;
+
+  </script>
+</body>
+</html>

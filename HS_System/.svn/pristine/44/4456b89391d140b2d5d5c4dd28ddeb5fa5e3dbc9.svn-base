@@ -1,0 +1,124 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+    
+<body>
+
+
+<head>
+<style>
+.form-control:disabled, .form-control[readonly] {
+    background-color: white;
+    opacity: 1;
+}
+
+.card-header{
+ 	border-bottom-width: 3px; border-bottom-color: #2A5F9E
+ }
+ 
+.card-title{
+	font-weight: bold;
+} 
+
+.class_content{
+	height: 500px;
+}
+
+.table td, .table th {
+	border-top: none;
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid #dee2e6;
+}
+
+
+</style>
+</head>
+
+<body>
+	 <div class="card card-outline">
+		<!-- <div class="card-header">
+			<h4>강의상세</h4>
+		</div> -->
+		
+		<div class="card-body">
+			<div class="card card-outline card-outline-tabs">
+				<div class="card-header p-0 border-bottom-0">
+					<ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
+						<li class="nav-item"><a class="nav-link active" id="custom-tabs-two-leave-tab" data-toggle="pill" href="#custom-tabs-two-leave" role="tab" aria-controls="custom-tabs-two-leave" aria-selected="true" onclick="">출석등록</a></li>
+						<li class="nav-item"><a class="nav-link" id="custom-tabs-two-return-tab" data-toggle="pill" href="#custom-tabs-two-return" role="tab" aria-controls="custom-tabs-two-return" aria-selected="false" onclick="">출석현황</a></li>
+					</ul>
+				</div>
+				<div class="card-body">
+					<div class="tab-content" id="custom-tabs-two-tabContent">
+						<div class="tab-pane fade show active" id="custom-tabs-two-leave" role="tabpanel" aria-labelledby="custom-tabs-two-leave-tab">
+							<!-- 강의계획서 탭 -->
+								<%@include file="../attendance_FaceRecognition.jsp"%>  
+						</div>
+						<div class="tab-pane fade" id="custom-tabs-two-return" role="tabpanel" aria-labelledby="custom-tabs-two-return-tab">
+							<!-- 강의평가 탭 -->
+								<%@include file="../attendanceStatus.jsp"%> 
+						</div>
+					</div>
+				</div>
+				<!-- /.card -->
+			</div>
+			<!-- /.card -->
+			
+			<div style="text-align: center;">	
+			<button type="button" class="btn btn-sm btnGray text-white" id="" onclick="window.close();" style="height: 31px; margin: center;">닫기</button>		
+			</div>
+		</div>
+	</div><!-- card card-outline --> 
+
+<script>
+function lectureStudentList(){
+	
+	data = {
+			"class_no" : "${class_no}",
+			"pro_no" : "${loginUser.id}"
+	};
+	
+	  $.ajax({
+			url : '<%=request.getContextPath()%>/lecture/management_prof/lectureStudentList',
+			data : JSON.stringify(data),
+			contentType : "application/json; charset=UTF-8",
+			type : 'post',
+			dataType : "json",
+			success : function(data) {
+			console.log(data);	
+			
+			printData(data.lectureStudentList,'.lectureStudentListTable','#lectureStudentList','.lectureStudentListBody');
+				
+			},
+			error : function(error) {
+				console.log(error);
+			}
+
+		});
+}
+</script>
+
+
+<script>
+window.onload() = function(){
+	lectureStudentList();
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
+<script id="lectureStudentList" type="text/x-handlebars-template">
+{{#each .}}
+			<tr class="lectureStudentListBody" style="text-align: center;">
+				<td>{{student_name}}</td>
+				<td>{{student_no}}</td>
+				<td>{{dept_nm}}</td>
+				<td><button type="button" onclick="" class="btn btn-xs text-white" style="background-color:#2A5F9E;">출석</button></td>
+			</tr>
+{{/each}}
+</script>
+
+
+
+</body>

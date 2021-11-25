@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Grades-Mapper">
+
+	<sql id="orderBy">
+		<if test="cri.searchType != null">
+			<if test="cri.searchType == 'lecture_semester'">
+				order by a.lecture_semester
+			</if>
+			<if test="cri.searchType == 'class_name'">
+				order by class_name
+			</if>
+			<if test="cri.searchType == 'class_type'">
+				order by class_type desc
+			</if>
+		</if>
+	</sql>
+
+	<select id="selectGradesByStudentNo" resultType="grades">
+		select * from
+		grades where student_no = #{student_no}
+	</select>
+
+
+	<select id="selectPreviousSemesterGradesByStudnetNo"
+		resultType="double">
+		select nvl(trunc(avg(grades_avg),2),0) avg
+		from grades
+		where
+		lecture_semester = (select max(lecture_semester)
+		from grades
+		where
+		grades_avg is not null
+		and student_no = #{student_no})
+	</select>
+
+	<select id="selectThisSemesterGradesByStudentNo"
+		resultType="grades">
+		<include refid="Common-Mapper.PageHeader" />
+	<![CDATA[
+		select 
+		a.STUDENT_NO, a.lecture_semester, a.class_no, a.ATTEND_SCORE, a.MIDDLE_SCORE, a.FIANL_SCORE, a.GRADES_CD, a.GRADES_AVG
+		, b.class_type, b.class_grade,b.class_name, (select name from account where account_no=(select account_no from professor where pro_no = b.pro_no)) as pro_nm,
+		case when 
+		(select count(*) from dissent_grades where class_no = a.class_no and lecture_semester = a.lecture_semester and student_no = a.student_no) > 0
+		then (select status_nm from common_code_detail where status_cd = 
+		(select status_cd from dissent_grades where class_no = a.class_no and lecture_semester = a.lecture_semester and student_no = a.student_no) )
+		else '없음' end as dissent_result
+		from grades a, lecture b 
+		where a.class_no = b.class_no
+		and   a.lecture_semester = b.lecture_semester
+		and a.student_no = #{grades.student_no} and a.lecture_semester = #{grades.lecture_semester}
+	]]>
+		<include refid="orderBy" />
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+
+	<sql id="search">
+		<if
+			test="grades.lecture_semester != null and grades.lecture_semester != ''">
+			and a.lecture_semester = #{grades.lecture_semester}
+		</if>
+	</sql>
+
+
+	<select id="selectGradesBySemester" resultType="grades">
+		<include refid="Common-Mapper.PageHeader" />
+	<![CDATA[
+		select a.*, b.class_type, b.class_name,b.class_grade,
+			case when
+			((select count(*) from grades where class_no = a.class_no and student_no = #{grades.student_no}) > 1) then 'Y'
+			ELSE 'N' END as retake
+			from grades a, lecture b
+			where 1=1 
+			  and a.student_no = #{grades.student_no}
+			  and a.class_no = b.class_no 
+			  and a.lecture_semester = b.lecture_semester
+		]]>
+		<include refid="search" />
+		<include refid="orderBy" />
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+
+	<select id="selectTotalGradesByStudentNo" resultType="grades">
+		select
+		sum(b.class_grade) as regist_score,
+		sum(b.class_grade) as getted_score,
+		sum(grades_avg) as sumAvg, avg(grades_avg) as grades_avg
+		from grades a,
+		lecture b
+		where student_no = #{student_no}
+		and a.class_no = b.class_no
+		and a.lecture_semester = b.lecture_semester
+	</select>
+
+	<select id="selectSemesterListByStudentNo" resultType="str">
+		select
+		distinct lecture_semester from grades where student_no = #{student_no}
+		order by lecture_semester desc
+	</select>
+
+	<select id="selectDissentSeq" resultType="str">
+		select
+		replace('DG'||to_char(sysdate,'YYMMDD')||to_char(grades_dissent_seq.nextval,'0000'),'
+		','') from dual
+	</select>
+
+	<update id="insertGradesDissent">
+		insert into dissent_grades (
+		dissent_grades_no,
+		register_reason,
+		status_cd,
+		student_no,
+		lecture_semester,
+		class_no
+		) values (
+		#{dissent_grades_no},
+		#{register_reason},
+		#{status_cd},
+		#{student_no},
+		#{lecture_semester},
+		#{class_no}
+		)
+	</update>
+
+	<select id="selectDissentGrades" resultType="gradesDissent">
+		select * from
+		dissent_grades where class_no = #{class_no} and lecture_semester =
+		#{lecture_semester} and student_no =#{student_no}
+	</select>
+
+	<select id="selectPdfGradesByStudentNo" resultType="grades">
+		select
+		a.class_no, a.lecture_semester, MAX(a.grades_cd) over (partition by
+		a.grades_cd) as grades_cd , b.class_name, b.class_type, b.class_grade
+		from grades a, lecture b
+		where student_no = #{student_no}
+		and a.class_no = b.class_no
+		and a.lecture_semester = b.lecture_semester
+		order by a.lecture_semester
+		desc, a.class_no asc
+	</select>
+
+	<select id="selectPdfTotalGrades" resultType="grades">
+		select
+		sum(class_grade) as class_grade, avg(grades_avg) as grades_avg
+		from
+		(select a.class_no, a.lecture_semester, MAX(a.grades_cd) over
+		(partition by a.grades_cd) as grades_cd , b.class_name, b.class_type,
+		b.class_grade, a.grades_avg
+		from grades a, lecture b
+		where student_no = #{student_no}
+		and a.class_no = b.class_no
+		and a.lecture_semester = b.lecture_semester
+		order by a.lecture_semester desc, a.class_no asc) tbl
+	</select>
+
+	<select id="selectDissentGradesListByPronNo" resultType="gradesDissent">
+		<include refid="Common-Mapper.PageHeader" />
+		select a.dissent_grades_no,a.class_no,a.student_no, b.class_name,c.grades_cd, d.status_name,
+			   (select name from account where account_no = (select account_no from student where student_no = a.student_no)) as student_name
+		  from dissent_grades a, lecture b, grades c, common_code_detail d
+		 where a.lecture_semester = b.lecture_semester
+		   and a.class_no = b.class_no
+		   and b.class_no = c.class_no
+		   and b.lecture_semester = c.lecture_semester
+		   and a.status_cd = d.status_cd
+		   and b.pro_no = #{pro_no}
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+
+
+</mapper>

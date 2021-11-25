@@ -1,0 +1,18 @@
+package kr.ac.hs.dao.lecture;
+
+import org.apache.ibatis.session.SqlSession;
+
+public class LectureManagementProfDAOImpl implements LectureManagementProfDAO {
+	private SqlSession session;
+	
+	public void setSqlSession(SqlSession session) {
+		this.session = session;
+	}
+	
+	
+	
+	
+	
+	
+	
+}

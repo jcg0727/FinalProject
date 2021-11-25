@@ -1,0 +1,41 @@
+package kr.ac.hs.dto.attendance;
+
+public class AttendanceStatusVO {
+	private String totalCount;
+	private String todayCount;
+	private String attenCount;
+	private String tardyCount;
+
+	public String getTotalCount() {
+		return totalCount;
+	}
+
+	public void setTotalCount(String totalCount) {
+		this.totalCount = totalCount;
+	}
+
+	public String getTodayCount() {
+		return todayCount;
+	}
+
+	public void setTodayCount(String todayCount) {
+		this.todayCount = todayCount;
+	}
+
+	public String getAttenCount() {
+		return attenCount;
+	}
+
+	public void setAttenCount(String attenCount) {
+		this.attenCount = attenCount;
+	}
+
+	public String getTardyCount() {
+		return tardyCount;
+	}
+
+	public void setTardyCount(String tardyCount) {
+		this.tardyCount = tardyCount;
+	}
+
+}

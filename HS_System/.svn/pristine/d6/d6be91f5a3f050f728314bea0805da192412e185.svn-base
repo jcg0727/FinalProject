@@ -1,0 +1,5 @@
+package kr.ac.hs.dao.lecture;
+
+public interface LectureStdDAO {
+
+}

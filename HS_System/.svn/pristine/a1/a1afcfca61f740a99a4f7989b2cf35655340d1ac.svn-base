@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="Account-Mapper">
+	<select id="updateSecurityLevel" parameterType="account">
+		update
+		account
+		set
+		security_level=#{security_level}
+		where
+		account_no=#{account_no}
+	</select>
+
+	<select id="selectSecurityLevel" parameterType="account"
+		resultType="account">
+		select a.*
+		from account a
+		<if test="gubun == 1">
+			, student b
+			where a.account_no = b.account_no
+			and
+			b.student_no = #{id}
+			and a.pwd = #{pwd}
+		</if>
+		<if test="gubun == 2">
+			, staff b
+			where a.account_no = b.account_no
+			and b.staff_no =
+			#{id}
+			and a.pwd = #{pwd}
+		</if>
+		<if test="gubun == 3">
+			, professor b
+			where a.account_no = b.account_no
+			and b.pro_no
+			= #{id}
+			and a.pwd = #{pwd}
+		</if>
+	</select>
+
+	<!-- 비밀번호 변경 -->
+	<update id="updatePw">
+		update account set pwd= #{pwd} where
+		account_no=#{account_no}
+	</update>
+
+	<!-- 비밀번호 변경(메일발송용) -->
+	<update id="updatePw23">
+		update account set pwd= #{pwd}
+		where
+		<if test="gubun == 1">
+			student_no = #{id}
+		</if>
+		<if test="gubun == 2">
+			staff_no = #{id}
+		</if>
+		<if test="gubun == 3">
+			pro_no = #{id}
+		</if>
+		and 
+		email=#{email}
+	</update>
+
+	<!-- 비밀번호 변경(메일발송용) -->
+	<update id="updatePw2">
+		UPDATE 
+			(
+		    		select a.pwd as pwd
+					from account a
+					<if test="gubun == 1">
+						,student b
+					</if>
+					<if test="gubun == 2">
+						,staff b
+					</if>
+					<if test="gubun == 3">
+						,professor b
+					</if>
+					WHERE
+					a.ACCOUNT_NO=b.ACCOUNT_NO
+					and a.email = #{email}
+					<if test="gubun == 1">
+						and b.student_no = #{id}
+					</if>
+					<if test="gubun == 2">
+						and b.staff_no = #{id}
+					</if>
+					<if test="gubun == 3">
+						and b.pro_no = #{id}
+					</if>
+				)
+			SET	pwd = #{pwd}
+	</update>
+
+	<!--  아이디 찾기 -->
+	<select id="selectId" resultType="account">
+		SELECT a.name,
+		<if test="gubun == 1">
+			b.student_no as student_no
+			FROM student b
+		</if>
+		<if test="gubun == 2">
+			b.staff_no as student_no
+			FROM staff b
+		</if>
+		<if test="gubun == 3">
+			b.pro_no as student_no
+			from professor b
+		</if>
+		,account a
+		WHERE
+		a.ACCOUNT_NO=b.ACCOUNT_NO
+		and a.name = #{name,
+		jdbcType=VARCHAR}
+		and a.reg_no = #{reg_no, jdbcType=VARCHAR}
+	</select>
+
+
+	<!-- 비밀번호 찾기 -->
+	<select id="selectUserCnt" resultType="int">
+		select count(*)
+		from account a
+		<if test="gubun == 1">
+			,student b
+		</if>
+		<if test="gubun == 2">
+			,staff b
+		</if>
+		<if test="gubun == 3">
+			,professor b
+		</if>
+		WHERE
+		a.ACCOUNT_NO=b.ACCOUNT_NO
+		and a.email = #{email}
+		<if test="gubun == 1">
+			and b.student_no = #{id}
+		</if>
+		<if test="gubun == 2">
+			and b.staff_no = #{id}
+		</if>
+		<if test="gubun == 3">
+			and b.pro_no = #{id}
+		</if>
+	</select>
+
+</mapper>

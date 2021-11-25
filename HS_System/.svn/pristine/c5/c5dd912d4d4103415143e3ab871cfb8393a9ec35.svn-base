@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Grades-Mapper">
+	<select id="selectGradesByStudentNo" resultType="grades">
+		select * from
+		grades where student_no = #{student_no}
+	</select>
+
+
+	<select id="selectPreviousSemesterGradesByStudnetNo"
+		resultType="double">
+		select nvl(trunc(avg(grades_avg),2),0) avg
+		from grades
+		where lecture_semester = (select max(lecture_semester)
+		from grades
+		where grades_avg is not null
+		and student_no = #{student_no})
+	</select>
+
+	<select id="selectThisSemesterGradesByStudentNo"
+		resultType="grades">
+		<include refid="Common-Mapper.PageHeader" />
+	<![CDATA[
+		select b.class_type, 
+		       b.class_name, 
+		       (select name from account where account_no = (select account_no from professor where pro_no = b.pro_no)) as pro_nm,
+		       (select class_grade from lecture where class_no = a.class_no and lecture_semester = a.lecture_semester) as regist_score,
+		       (select class_grade from lecture where class_no = a.class_no and lecture_semester = a.lecture_semester) as getted_score,
+		       a.*,
+		         case when (select count(*) from dissent_grades where student_no = a.student_no and lecture_semester = a.lecture_semester and class_no = a.class_no) > 0 
+		            then 
+		            (select status_nm from common_code_detail where status_cd = 
+		            (select status_cd from dissent_grades where student_no = a.student_no and lecture_semester = a.lecture_semester and class_no = a.class_no))
+		            else 'N' END as dissent_result
+		  from grades a, lecture b
+		 where 1=1
+		   and a.class_no = b.class_no
+		   and a.lecture_semester = #{lecture_semester} 
+		   and a.student_no = #{student_no}
+	]]>
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+
+	<sql id="search">
+		<if test="lecture_semester != null and lecture_semester != ''">
+			and a.lecture_semester = #{lecture_semester}
+		</if>
+	</sql>
+	
+	
+	<select id="selectGradesBySemester" resultType="grades">
+		<include refid="Common-Mapper.PageHeader" />
+	<![CDATA[
+		select a.*, b.class_type, b.class_name,
+			case when
+			((select count(*) from grades where class_no = a.class_no and student_no = #{student_no}) > 1) then 'Y'
+			ELSE 'N' END as retake
+			from grades a, lecture b
+			where 1=1 
+			  and a.student_no = #{student_no}
+			  and a.class_no = b.class_no 
+			  and a.lecture_semester = b.lecture_semester
+		]]>
+		<include refid="search"/>
+		<include refid="Common-Mapper.PageFooter" />
+	</select>
+
+	<select id="selectTotalGradesByStudentNo" resultType="grades">
+		select
+		sum(b.class_grade) as regist_score,
+		sum(b.class_grade) as getted_score,
+		sum(grades_avg) as sumAvg, avg(grades_avg) as grades_avg
+		from grades a, lecture b
+		where student_no = #{student_no}
+		and a.class_no = b.class_no
+		and a.lecture_semester = b.lecture_semester
+	</select>
+	
+	<select id="selectSemesterListByStudentNo" resultType="str">
+		select distinct lecture_semester from grades where student_no = #{student_no} order by lecture_semester desc	
+	</select>
+</mapper>

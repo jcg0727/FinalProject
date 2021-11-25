@@ -1,0 +1,29 @@
+package kr.ac.hs.dao.grades;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.dto.grades.GradesDissentVO;
+import kr.ac.hs.dto.grades.GradesVO;
+
+public interface GradesDAO {
+	public List<GradesVO> selectGradesByStudentNo(String student_no) throws SQLException;
+
+	double selectPreviousSemesterGradesByStudnetNo(String student_no) throws SQLException;
+
+	public List<GradesVO> selectThisSemesterGradesByStudentNo(Map<String,Object> dataMap) throws SQLException;
+	
+	public List<GradesVO> selectGradesBySemester(Map<String,Object> dataMap) throws SQLException;
+
+	public GradesVO selectTotalGradesByStudentNo(String student_no) throws SQLException;
+
+	public List<String> selectSemesterListByStudentNo(String student_no) throws SQLException;
+
+	public String selectDissentSeq() throws SQLException;
+
+	public void insertGradesDissent(GradesDissentVO dissent) throws SQLException;
+
+	public GradesDissentVO selectDissentGrades(GradesDissentVO dissent) throws SQLException;
+}

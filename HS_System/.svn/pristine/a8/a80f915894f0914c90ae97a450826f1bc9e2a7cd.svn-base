@@ -1,0 +1,20 @@
+package kr.ac.hs.dao.notice;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import kr.ac.hs.command.Criteria;
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.dto.notice.NoticeVO;
+
+public interface NoticeDAO {
+
+	List<NoticeVO> selectNoticeY()throws SQLException;
+	
+/*	List<NoticeVO> selectNoticeN()throws SQLException;
+	List<NoticeVO> selectNoticeN(Criteria cri)throws SQLException;*/
+	List<NoticeVO> selectNoticeN(SearchCriteria cri)throws SQLException;
+	
+	int selectNoticeNSearchCount(SearchCriteria cri)throws SQLException;
+	
+}

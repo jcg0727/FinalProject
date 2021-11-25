@@ -1,0 +1,56 @@
+package kr.ac.hs.service.notice;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import kr.ac.hs.command.Criteria;
+import kr.ac.hs.command.PageMaker;
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.dao.notice.NoticeDAO;
+import kr.ac.hs.dto.notice.NoticeVO;
+
+public class NoticeServiceImpl implements NoticeService {
+	
+	private NoticeDAO noticeDAO;
+	
+	public void setNoticeDAO(NoticeDAO noticeDAO) {
+		this.noticeDAO = noticeDAO;
+	}
+	
+
+	@Override
+	public List<NoticeVO> selectNoticeY() throws SQLException {
+		List<NoticeVO> noticeList = noticeDAO.selectNoticeY();
+		return noticeList;
+	}
+
+/*	@Override
+	public List<NoticeVO> selectNoticeN() throws SQLException {
+		List<NoticeVO> noticeList = noticeDAO.selectNoticeN();
+		return noticeList;
+	}
+
+	@Override
+	public List<NoticeVO> selectNoticeN(Criteria cri) throws SQLException {
+		List<NoticeVO> noticeList = noticeDAO.selectNoticeN(cri);
+		return noticeList;
+	}*/
+
+	@Override
+	public Map<String, Object> selectNoticeN(SearchCriteria cri) throws SQLException {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		
+		PageMaker pageMaker = new PageMaker();
+		cri.setPerPageNum(5);
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(noticeDAO.selectNoticeNSearchCount(cri));
+		
+		List<NoticeVO> noticeList = noticeDAO.selectNoticeN(cri);
+		dataMap.put("noticeList", noticeList);
+		dataMap.put("pageMaker", pageMaker);
+		return dataMap;
+	}
+
+}

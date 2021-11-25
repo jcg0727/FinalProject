@@ -1,0 +1,37 @@
+package kr.ac.hs.controller.main;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.dto.notice.NoticeVO;
+import kr.ac.hs.service.notice.NoticeService;
+
+@Controller
+public class MainController {
+
+	@Autowired
+	private NoticeService noticeService;
+	
+	@RequestMapping("/main")
+	public ModelAndView main(ModelAndView mnv, SearchCriteria cri)throws SQLException{
+		String url = "main/main";
+		
+		List<NoticeVO> YList =  noticeService.selectNoticeY();
+		Map<String, Object> dataMap = noticeService.selectNoticeN(cri);
+		
+		mnv.addObject("YList", YList);
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+		
+		return mnv;
+	}
+	
+	
+}

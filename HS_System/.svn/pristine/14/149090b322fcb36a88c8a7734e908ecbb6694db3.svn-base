@@ -1,0 +1,12 @@
+package kr.ac.hs.service.lecture;
+
+import kr.ac.hs.dao.lecture.LectureStdDAO;
+
+public class LectureStdServiceImpl implements LectureStdService {
+	private LectureStdDAO lecDAO;
+
+	public void setLecDAO(LectureStdDAO lecDAO) {
+		this.lecDAO = lecDAO;
+	}
+
+}

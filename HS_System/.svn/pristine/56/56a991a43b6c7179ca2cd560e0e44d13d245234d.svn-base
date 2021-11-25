@@ -1,0 +1,11 @@
+package kr.ac.hs.dao.attendance;
+
+import java.sql.SQLException;
+
+import kr.ac.hs.command.attendance.AttendanceCommand;
+
+public interface AttendanceDAO {
+	
+	public String insertAttendance(AttendanceCommand cmd) throws SQLException;
+
+}

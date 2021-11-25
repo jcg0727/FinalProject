@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LecturePlan-Mapper">
+
+	<!-- 강의계획 조회 -->
+	<select id="selectLecturePlan">
+		select *
+		from lecture_plan
+	</select>
+
+	<!-- 강의계획 작성 -->
+	<update id="insertLecturePlan">
+		INSERT INTO DEPARTMENT(LECTURE_SEMESTER,
+		CLASS_NO,
+		LECTURE_SUMMARY,
+		LECTURE_GOAL,
+		TEXTBOOK
+		)VALUES
+		(#{lecture_semester},
+		#{class_no},
+		#{lecture_summary},
+		#{lecture_summary},
+		#{lecture_goal},
+		#{text_book})
+	</update>
+	
+
+
+
+
+</mapper>

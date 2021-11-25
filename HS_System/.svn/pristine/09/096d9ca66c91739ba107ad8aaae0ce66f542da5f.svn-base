@@ -1,0 +1,15 @@
+package kr.ac.hs.service.attendance;
+
+import java.sql.SQLException;
+
+import kr.ac.hs.command.attendance.AttendanceCommand;
+import kr.ac.hs.dao.attendance.AttendanceDAO;
+
+public interface AttendanceService {
+	
+	// 출석등록
+	public String registAttendance(AttendanceCommand cmd) throws SQLException;
+	
+	
+	
+}

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LectureStd-Mapper">
+	<sql id="search">
+		<if test="cri.searchType == 'gb'.toString()">
+			and( b.class_name like '%'||#{cri.keyword}||'%'
+			or d.name like
+			'%'||#{cri.keyword}||'%')
+		</if>
+		<if test="cri.searchType == 'gm'.toString()">
+			and b.class_name like '%'||#{cri.keyword}||'%'
+		</if>
+		<if test="cri.searchType == 'gs'.toString()">
+			and d.name like '%'||#{cri.keyword}||'%'
+		</if>
+	
+	</sql>
+
+
+	<select id="lectureStuBasicList" resultType="lecture">
+		<include refid="Common-Mapper.PageHeader" />
+		SELECT
+<!-- 		a.student_no, -->
+		(substr(a.lecture_semester,1,4)||'-'||substr(a.lecture_semester,6,1)||'학기') as lecture_semester2,
+		b.lecture_semester,
+		(substr(a.lecture_semester,1,4)) as lecture_semester3,
+		(substr(a.lecture_semester,6,1)) as lecture_semester4,
+		a.class_no,
+		b.class_name,
+		b.class_grade,
+		b.class_type,
+		d.name
+		FROM
+		lecture_register a,
+		lecture b,
+		professor c,
+		account d
+		WHERE
+		a.class_no = b.class_no
+		AND
+		b.pro_no =
+		c.pro_no
+		AND
+		c.account_no = d.account_no
+		AND  b.lecture_semester = a.lecture_semester
+		AND  b.lecture_semester like '%202102%'
+		AND a.student_no =
+		#{student_no}
+		<include refid="search" />
+		<include refid="Common-Mapper.PageFooter" />
+		
+	</select>
+	
+	<select id="lectureStuPlanDetail" resultType="lecture">
+		SELECT
+		    ( substr(b.lecture_semester,1,4)
+		    || '년' ) AS lecture_year,
+		    ( substr(b.lecture_semester,6,1)
+		    || '학기' ) AS lecture_semester2,
+		    b.lecture_semester,
+		    b.class_no,
+		    b.class_name,
+		    b.class_grade,
+		    b.class_type,
+		    d.name,
+		    d.email,
+		    d.phone,
+		    e.lecture_goal,
+		    e.lecture_summary,
+		    e.textbook_main,
+		    e.textbook_sub,
+		    b.dept_name,
+		    e.week_1,
+		    e.week_2,
+		    e.week_3,
+		    e.week_4,
+		    e.week_5,
+		    e.week_6,
+		    e.week_7,
+		    e.week_8,
+		    e.week_9,
+		    e.week_10
+		FROM
+		    lecture b,
+		    professor c,
+		    account d,
+		    lecture_plan e
+		WHERE
+		    1 = 1
+		    AND   b.class_no = e.class_no (+)
+		    AND   b.pro_no = c.pro_no
+		    AND   d.account_no = c.account_no
+		    and e.lecture_semester(+) = b.LECTURE_SEMESTER
+		    AND   b.class_no = #{class_no}
+		    AND   b.lecture_semester = #{lecture_semester}
+	</select>
+
+
+
+
+
+</mapper>

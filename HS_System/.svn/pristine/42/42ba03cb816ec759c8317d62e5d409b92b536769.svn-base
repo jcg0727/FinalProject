@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="Account-Mapper">
+	<select id="updateSecurityLevel" parameterType="account">
+		update
+		account
+		set
+		security_level=#{security_level}
+		where
+		account_no=#{account_no}
+	</select>
+
+	<select id="selectSecurityLevel" parameterType="account"
+		resultType="account">
+		select a.*
+		from account a
+		<if test="gubun == 1">
+			, student b
+			where a.account_no = b.account_no
+			and
+			b.student_no = #{id}
+			and a.pwd = #{pwd}
+		</if>
+		<if test="gubun == 2">
+			, staff b
+			where a.account_no = b.account_no
+			and b.staff_no =
+			#{id}
+			and a.pwd = #{pwd}
+		</if>
+		<if test="gubun == 3">
+			, professor b
+			where a.account_no = b.account_no
+			and b.pro_no
+			= #{id}
+			and a.pwd = #{pwd}
+		</if>
+	</select>
+
+	<!-- 비밀번호 변경 -->
+	<update id="updatePw">
+		update account set pwd= #{pwd} where
+		account_no=#{account_no}
+	</update>
+
+	<!-- 교수아이디 찾기 -->
+	<select id="selectProId" parameterType="java.util.Map"
+		resultType="account">
+		select b.pro_no as pro_no
+		from account a, professor b
+		WHERE
+		a.ACCOUNT_NO=b.ACCOUNT_NO
+		and a.name = #{name, jdbcType=VARCHAR}
+		and
+		a.reg_no = #{reg_no, jdbcType=VARCHAR}
+	</select>
+	<!-- 교직원아이디 찾기 -->
+	<select id="selectStaffId" parameterType="java.util.Map"
+		resultType="account">
+		select b.staff_no as staff_no
+		from account a, staff b
+		WHERE
+		a.ACCOUNT_NO=b.ACCOUNT_NO
+		and
+		a.name = #{name, jdbcType=VARCHAR}
+		and
+		a.reg_no =
+		#{reg_no,
+		jdbcType=VARCHAR}
+	</select>
+	<!-- 아이디 찾기 -->
+	<select id="selectStuId" resultType="account">
+		select a.name,
+		<if test="gubun == 1">
+			b.student_no as student_no
+			from account a,student b
+			WHERE
+			a.ACCOUNT_NO=b.ACCOUNT_NO
+			and a.name =
+			#{name, jdbcType=VARCHAR}
+			and
+			a.reg_no =
+			#{reg_no, jdbcType=VARCHAR}
+		</if>
+		<if test="gubun == 2">
+			b.staff_no as student_no
+			from account a, staff b
+			WHERE
+			a.ACCOUNT_NO=b.ACCOUNT_NO
+			and
+			a.name = #{name, jdbcType=VARCHAR}
+			and
+			a.reg_no =
+			#{reg_no,
+			jdbcType=VARCHAR}
+		</if>
+		<if test="gubun == 3">
+			b.pro_no as student_no
+			from account a, professor b
+			WHERE
+			a.ACCOUNT_NO=b.ACCOUNT_NO
+			and a.name = #{name, jdbcType=VARCHAR}
+			and
+			a.reg_no = #{reg_no, jdbcType=VARCHAR}
+		</if>
+
+	</select>
+
+	<select id="selectStuId12" resultType="account">
+		select
+		b.student_no as
+		student_no
+		from account a, student b
+		WHERE
+		a.ACCOUNT_NO=b.ACCOUNT_NO
+		and
+		a.name =
+		#{name}
+		and
+		a.reg_no =
+		#{reg_no}
+
+	</select>
+
+</mapper>

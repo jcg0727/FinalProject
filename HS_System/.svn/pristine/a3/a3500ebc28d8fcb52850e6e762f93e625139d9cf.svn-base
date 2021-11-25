@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StaffCurriculum-Mapper">
+	<sql id="search">
+		<if test="cri.searchType == 'cno'.toString()">
+			and a.pass_whether like '%'||#{keyword}||'%'
+		</if>
+		<if test="cri.searchType == 'cnm'.toString()">
+			and a.pass_whether like '%'||#{keyword}||'%'
+		</if>
+		<if test="cri.searchType == 'cdiv'.toString()">
+			and a.pass_whether like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+	
+	<select id="selectCurriculumDeptStaff" resultType="curriculum">
+		select row_number() over(order by class_no)as no, a.class_no, b.dept_nm, 
+			   a.class_nm,a.class_score, a.curri_content, a.delete_whether, a.grade, a.class_type_cd 
+		  from curriculum a, staff b
+		where a.dept_cd = b.dept_cd and
+			  a.delete_whether = 'N' and
+		       b.staff_no = #{staff_no}
+       		   <include refid="search"/>
+	</select>
+	
+	<select id="selectCurriculumDeptStaffCount" resultType="int">
+		select count(*)
+		  from curriculum a, staff b
+		 where a.dept_cd = b.dept_cd and
+		 	   a.delete_whether = 'N' and
+		       b.staff_no = #{staff_no}      
+       		   <include refid="search"/>
+	</select>
+	
+	<select id="selectCurriculumStaff" resultType="curriculum">
+		select row_number() over(order by class_no)as no, a.class_no, b.dept_nm, 
+		   	   a.class_nm,a.class_score, a.curri_content, a.delete_whether, a.grade, a.class_type_cd 
+		  from curriculum a, staff b
+		 where a.dept_cd = b.dept_cd and
+		 	   a.delete_whether = 'N'
+       		   <include refid="search"/>
+	</select>
+	
+	<select id="selectCurriculumStaffCount" resultType="int">
+		select count(*)
+		  from curriculum
+		  where a.delete_whether = 'N'
+       		   <include refid="search"/>
+	</select>
+	
+	<update id="insertCurriculumStaff">
+		insert into curriculum 
+       values('CA00'||to_char(STUNO_SEQ.NEXTVAL), 
+              #{dept_cd},#{class_nm},#{class_score},#{curri_content},
+              #{delete_whether},#{grade},#{class_type_cd})
+	</update>
+	
+	<update id="deleteCurriculumWhether">
+		update curriculum
+		   set delete_whether = 'Y'
+		 where class_no = #{class_no}
+	</update>
+</mapper>

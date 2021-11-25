@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="Menu-Mapper">
+	<select id="selectMainMenu" resultType="menu">
+		select 
+			a.mcode, a.mname, a.upcode, a.micon, b.url, b.authority_cd 
+		from 
+			menu a, menu_authority b 
+		where 
+			1=1
+			and a.isnav = 1
+			and a.mcode = b.mcode 
+			and mlevel=1
+			and b.authority_cd = #{authority_cd}
+	</select>
+	
+	<select id="selectSubMenu" resultType="menu">
+		select 
+			a.mcode, a.mname, a.upcode, a.micon, b.url, b.authority_cd 
+		from 
+			menu a, menu_authority b 
+		where 
+			1=1
+			and a.isnav = 1
+	        and a.upcode = #{upcode}
+			and a.mcode = b.mcode and b.authority_cd = #{authority_cd}
+	</select>
+	
+	<select id="selectMenuByMcode" resultType="menu">
+		select * from menu_authority where authority_cd = #{authority_cd} and mcode = #{mcode}
+	</select>
+	
+	<select id="selectMenuByMname" resultType="menu">
+		select *
+		from menu
+		where mName = #{mname}
+	</select>
+</mapper>

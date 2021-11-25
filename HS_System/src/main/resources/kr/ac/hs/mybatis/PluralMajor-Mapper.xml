@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PluralMajor-Mapper">
+	<sql id="search">
+		<if test = "dept_nm != null">
+<!-- 			and a.dept_nm = #{dept_nm} -->
+<!-- 			and a.status_nm like '%'||#{cri.searchType}||'%' -->
+				and regexp_like (status_nm, '신청완료|지도교수승인|소속학과승인|반려')
+		</if>  
+		<if test = "apply_deptnm != null">
+<!-- 			and a.apply_deptnm = #{dept_nm} -->
+				and regexp_like (status_nm, '신청완료|지도교수승인|소속학과승인|반려')
+<!-- 			and a.status_nm like '%'||#{cri.searchType}||'%' -->
+		</if>  
+		<if test="cri != null">
+			and a.status_nm like '%'||#{cri.searchType}||'%'
+		</if>
+	
+<!-- 		<if test="cri.searchType == '신청완료'.toString()"> -->
+<!-- 			and a.status_nm like '%'||#{cri.searchType}||'%' -->
+<!-- 		</if> -->
+<!-- 		<if test="cri.searchType == '지도교수승인'.toString()"> -->
+<!-- 			and a.status_nm like '%'||#{cri.searchType}||'%' -->
+<!-- 		</if> -->
+<!-- 		<if test="cri.searchType == '소속학과승인'.toString()"> -->
+<!-- 			and a.status_nm like '%'||#{cri.searchType}||'%' -->
+<!-- 		</if> -->
+<!-- 		<if test="cri.searchType == '반려'.toString()"> -->
+<!-- 			and a.status_nm like '%'||#{cri.searchType}||'%' -->
+<!-- 		</if> -->
+	</sql>
+
+	<select id="selectPluralMajorByStudentNO" resultType="plural">
+		select row_number() over(order by register_date desc) as No , a.*
+			from plural_major a where student_no = #{student_no} order by register_date desc
+	</select>
+	<select id="selectStudentInfoByPlural" parameterType="str" resultType="plural">
+		select 
+		a.student_no,
+		b.registdate,
+		a.status_cd,
+		a.dept_cd,
+		to_char(sysdate,'YYYY')-to_char(b.registdate,'YYYY') +1 as regisdate
+		from student a, applicant b
+		where a.student_no = #{student_no}
+		and a.applicant_no=b.applicant_no
+	</select>
+	<update id="insertPluralMajor">
+		insert into plural_major(register_date, student_no, status_cd, dept_nm, dept_cd, apply_deptcd, apply_deptnm, counsel_status_nm, counsel_no, status_nm)
+		values (sysdate, #{student_no}, 'CCDH001', #{dept_nm}, 'dept_cdNull', #{apply_deptcd,jdbcType=VARCHAR}, #{apply_deptnm,jdbcType=VARCHAR}, '대기', #{counsel_no,jdbcType=VARCHAR},'신청완료')
+		
+	</update>
+	
+	<select id="selectPluralList" resultType="plural">
+		select row_number() over(order by register_date desc) as No , a.*
+      	from plural_major a
+      	order by register_date desc
+	</select>	
+	
+	<select id="selectPluralSeqNext" resultType="int">
+		select plural_seq.nextval as pluno from dual
+	</select>
+	
+	<update id="deletePlural" parameterType="str">
+		delete from plural_major
+		where student_no = #{student_no}
+	</update>
+	
+	<select id="selectPluralByStaffDeptnm" resultType="plural">
+	select row_number() over(order by register_date desc) as no, 
+			A.*, B.name,B.account_no 
+		from plural_major A, account B, student c
+		where a.student_no = c.student_no
+		and c.account_no = b.account_no
+		and a.dept_nm = #{dept_nm}
+		<include refid="search" />
+		order by register_date desc
+	</select>
+	
+	<select id="selectStudentByApplyStaffDeptnm" resultType="plural">
+		select row_number() over(order by register_date desc) as no, 
+			A.*, B.name, B.account_no
+		from plural_major A, account B, student c
+		where a.student_no = c.student_no
+		and c.account_no = b.account_no
+		and a.apply_deptnm = #{dept_nm}
+		<include refid="search" />
+		order by register_date desc
+	</select>
+	
+	<select id ="selectCountPluralMajor" resultType="int">
+		select count(*) from plural_major a
+		where 1=1
+		<include refid="search" />
+	</select>
+	
+	<select id="selectStudentDetailByStudentNo" resultType="plural">
+		    select distinct a.*, 
+		    	   c.name, 
+		    	   d.phone, 
+		    	   (select avg(grades_avg) from grades where student_no = #{student_no}) as grades_avg, 
+		    	   (select b.name from professor a, account b, advisor c, plural_major d where a.account_no = b.account_no
+                                                                                          and a.pro_no = c.pro_no
+                                                                                          and d.student_no = c.student_no
+                                                                                          and c.student_no = #{student_no}) as pro_nm                 
+            from plural_major a, student b, account c, applicant d, grades e
+            where a.student_no = #{student_no}
+            and a.student_no = b.student_no
+            and b.account_no = c.account_no
+            and b.applicant_no = d.applicant_no
+            and a.student_no = e.student_no    
+	</select>
+	
+</mapper>
+

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Student-Mapper">
+	<sql id="search">
+		<if test="searchType == 'gb'.toString()">
+			and( b.student_no like '%'||#{keyword}||'%'
+			or a.name like
+			'%'||#{keyword}||'%' or c.dept_nm like '%'||#{keyword}||'%')
+		</if>
+		<if test="searchType == 'nm'.toString()">
+			and a.name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'nb'.toString()">
+			and b.student_no like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'dt'.toString()">
+			and c.dept_nm like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+
+	<!-- 학생 목록 검색(selectbox) -->
+	<select id="selectStudentListBySearchMenu" resultType="student">
+		SELECT
+		b.student_no,
+		c.dept_nm,
+		a.name
+		FROM
+		applicant a,
+		student b,
+		department c
+		WHERE
+		a.applicant_no=b.applicant_no
+		AND b.dept_cd =c.dept_cd
+		AND a.regist_check = 'Y'
+		AND b.student_no IS NOT NULL
+		<include refid="search" />
+		order by c.dept_nm, b.student_no
+	</select>
+	<!-- 학생 목록 검색(학과 popup) -->
+	<select id="selectStudentListByDept" resultType="student">
+		SELECT
+		b.student_no,
+		c.dept_nm,
+		a.name
+		FROM
+		applicant a,
+		student b,
+		department c
+		WHERE
+		a.applicant_no=b.applicant_no
+		AND b.dept_cd =c.dept_cd
+		AND a.regist_check = 'Y'
+		AND b.student_no IS NOT NULL
+		AND C.DEPT_NM = #{dept_nm}
+		<include refid="search" />
+		order by b.student_no
+	</select>
+
+	<!-- 학생목록 COUNT -->
+	<select id="selectStudentListCount" resultType="int">
+		SELECT
+		count(*)
+		FROM
+		applicant a,
+		student b,
+		department c
+		WHERE
+		a.applicant_no =
+		b.applicant_no
+		AND b.dept_cd = c.dept_cd
+		AND
+		a.regist_check = 'Y'
+		AND
+		b.student_no IS NOT NULL
+		order by b.student_no
+	</select>
+
+	<!-- 학생 목록 검색(학과 popup) count -->
+	<select id="selectStudentListByDeptCount" resultType="int">
+		SELECT
+		count(*)
+		FROM
+		applicant a,
+		student b,
+		department c
+		WHERE
+		a.applicant_no
+		=b.applicant_no
+		AND b.dept_cd = c.dept_cd
+		AND
+		a.regist_check = 'Y'
+		AND b.student_no IS NOT NULL
+		AND C.DEPT_NM = #{dept_nm}
+		<include refid="search" />
+	</select>
+
+	<!-- 학생 목록 검색 count -->
+	<select id="selectStudentListBySearchMenuCount" resultType="int">
+		SELECT
+		count(*)
+		FROM
+		applicant a,
+		student b,
+		department c
+		WHERE
+		a.applicant_no
+		=b.applicant_no
+		AND b.dept_cd = c.dept_cd
+		AND
+		a.regist_check = 'Y'
+		AND b.student_no IS NOT NULL
+		<include refid="search" />
+	</select>
+
+
+	<!-- 학생 상세보기 -->
+	<select id="selectStudentbyStudentNo" parameterType="str"
+		resultType="student">
+		select *
+		from student A, account B
+		where
+		A.student_no=#{student_no}
+		AND a.account_no = b.account_no
+
+	</select>
+
+	<!-- 학생목록 조회 -->
+	<select id="selectStudentList" resultType="student">
+		SELECT
+		b.student_no,
+		c.dept_nm,
+		a.name,
+		a.email,
+		a.address,
+		a.detail_add,
+		a.phone,
+		a.registdate
+		FROM
+		applicant a,
+		student b,
+		department c
+		WHERE
+		a.applicant_no =
+		b.applicant_no
+		AND b.dept_cd = c.dept_cd
+		AND a.regist_check = 'Y'
+		AND
+		b.student_no IS NOT NULL
+		order by b.student_no
+	</select>
+
+	<!-- 학생 상세보기 -->
+	<select id="selectStudentDetail" parameterType="str"
+		resultType="student">
+		SELECT
+		b.student_no,
+		c.dept_nm,
+		a.name,
+		a.email,
+		a.address,
+		a.detail_add,
+		a.phone,
+		a.registdate,
+		b.status_cd,
+		d.gender
+		FROM
+		applicant a,
+		student b,
+		department c,
+		account d
+		WHERE
+		a.applicant_no = b.applicant_no
+		AND b.dept_cd = c.dept_cd
+		AND b.ACCOUNT_NO=d.ACCOUNT_NO
+		AND
+		a.regist_check = 'Y'
+		AND b.student_no IS NOT NULL
+		AND
+		b.student_no=#{student_no, jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectStudentAcuntByStudentNo" parameterType="str"
+		resultType="stuInfo">
+		select STUDENT_NO, ACUNT_NN, ACUNT_BANK, ACUNT_NO from
+		student_acunt where student_no=(select student_no from student
+		where
+		account_no=#{account_no})
+	</select>
+
+	<select id="selectAdvisorByStudnetNo" resultType="advisor">
+		select * from
+		advisor where student_no = #{student_no}
+	</select>
+
+	<select id="selectStudentByDeptName" resultType="student">
+		select * from
+		student
+		where
+		1=1
+		and dept_cd = (select dept_cd from department where
+		dept_nm =
+		#{dept_nm})
+	</select>
+
+</mapper>

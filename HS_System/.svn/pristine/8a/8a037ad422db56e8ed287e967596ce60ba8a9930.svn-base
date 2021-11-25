@@ -1,0 +1,34 @@
+package kr.ac.hs.dao.tuition;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
+
+import kr.ac.hs.dto.tuition.TuitionVO;
+
+public class TuitionDAOImpl implements TuitionDAO {
+	
+	private SqlSession session;
+	private String namespace = "Tuition-Mapper.";
+	
+	public void setSqlsession(SqlSession session) {
+		this.session = session;
+	}
+
+	@Override
+	public List<TuitionVO> selectTuitionList(String studentNo) throws SQLException {
+		List<TuitionVO> tuitionList = session.selectList(namespace + "selectTuitionList", studentNo);
+		return tuitionList;
+	}
+
+	@Override
+	public List<TuitionVO> selectTuitionDetail(TuitionVO tuitionVO) throws SQLException {
+		List<TuitionVO> tuitionDetailList = session.selectList(namespace + "selectTuitionDetail", tuitionVO);
+		return tuitionDetailList;
+	}
+
+   
+
+
+}

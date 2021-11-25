@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Attendance-Mapper">
+
+<update id="insertAttendance">
+
+insert into ATTENDANCE
+values 
+(
+    (SELECT DISTINCT substr(ATTEND_NO,1,9) || 
+                                    (
+                                        SELECT lpad(max(to_number(substr(substr(ATTEND_NO,1,13),10,14)))+1,4,'0')
+                                        FROM ATTENDANCE
+                                        where substr(ATTEND_NO,4,6) = to_char(sysdate, 'YYMMDD')     
+                                    )
+    FROM ATTENDANCE
+    where substr(ATTEND_NO,4,6) = to_char(sysdate, 'YYMMDD')),
+SYSDATE,
+'N',
+'202102',
+#{class_no},
+#{student_no}
+)
+
+</update>
+
+
+
+
+
+
+
+
+
+
+</mapper>

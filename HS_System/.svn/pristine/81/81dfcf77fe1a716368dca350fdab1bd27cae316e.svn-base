@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Notice-Mapper">
+
+	<sql id="search">	
+		<if test="searchType == 'title'.toString()">
+			and A.title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'con'.toString()">
+			and A.content like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'name'.toString()">
+			and B.name like '%'||#{keyword}||'%'
+		</if>	
+		<if test="searchType == 'target'.toString()">
+			and A.target=#{keyword}			
+		</if>	
+	</sql>	
+
+
+	<select id="selectNoticeY" resultType="notice">
+		select 
+		notice_no, title, content, count, regist_date, importance,target,name
+		from(
+		select row_number() over(order by A.regist_date desc)as num,
+		A.notice_no, A.title, A.content, A.count, A.regist_date, A.importance,A.target,B.name
+		from notice A, account B  
+		where A.account_no=B.account_no
+		and A.importance='Y'
+		order by A.regist_date desc, A.title asc
+		)
+		<![CDATA[where rownum <= 2]]>
+	</select>
+	
+	<select id="selectNoticeN" resultType="notice">
+		select row_number() over(order by A.regist_date desc)as num,
+		A.notice_no, A.title, A.content, A.count, A.regist_date, A.importance,A.target,B.name
+		from notice A, account B  
+		where A.account_no=B.account_no		
+		order by A.regist_date desc
+	</select>
+	
+	<select id="selectNoticeNSearch" resultType="notice">
+		select row_number() over(order by A.regist_date desc)as num,
+		A.notice_no, A.title, A.content, A.count, A.regist_date, A.importance,A.target,B.name
+		from notice A, account B  
+		where A.account_no=B.account_no
+		<include refid="search" />
+		order by A.regist_date desc
+	</select>
+	
+	<select id="selectNoticeNSearchCount" resultType="int">
+		select count(*)
+		from notice A, account B  
+		where A.account_no=B.account_no
+		<include refid="search" />
+		order by A.regist_date desc
+	</select>
+	
+
+
+</mapper>

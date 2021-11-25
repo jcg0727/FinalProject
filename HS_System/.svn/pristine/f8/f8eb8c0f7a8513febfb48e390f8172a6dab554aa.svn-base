@@ -1,0 +1,70 @@
+package kr.ac.hs.command.scholar;
+
+import java.util.Date;
+
+import kr.ac.hs.dto.scholar.ScholarVO;
+
+public class ScholarCommand {
+
+	private String student_no;
+	private String scholar_amount;
+	private String grade;
+	private String status_cd;
+	Date recommend_date;
+	
+	public ScholarVO toUpdateStaff() throws Exception{
+		ScholarVO vo = new ScholarVO();
+		
+		vo.setScholar_amount(scholar_amount);
+		vo.setStudent_no(student_no);
+		vo.setRecommend_date(recommend_date);
+
+		return vo;
+	}
+	
+	public ScholarVO toDelete() throws Exception{
+		ScholarVO vo = new ScholarVO();
+		
+		vo.setStudent_no(student_no);
+		vo.setRecommend_date(recommend_date);
+	
+		return vo;
+	}
+	
+	public String getGrade() {
+		return grade;
+	}
+
+	public void setGrade(String grade) {
+		this.grade = grade;
+	}
+
+	public String getStatus_cd() {
+		return status_cd;
+	}
+
+	public void setStatus_cd(String status_cd) {
+		this.status_cd = status_cd;
+	}
+
+	public String getStudent_no() {
+		return student_no;
+	}
+	public void setStudent_no(String student_no) {
+		this.student_no = student_no;
+	}
+	public String getScholar_amount() {
+		return scholar_amount;
+	}
+	public void setScholar_amount(String scholar_amount) {
+		this.scholar_amount = scholar_amount;
+	}
+	public Date getRecommend_date() {
+		return recommend_date;
+	}
+	public void setRecommend_date(Date recommend_date) {
+		this.recommend_date = recommend_date;
+	}
+	
+	
+}

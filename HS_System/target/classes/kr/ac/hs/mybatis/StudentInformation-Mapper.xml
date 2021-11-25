@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="StudentInformation-Mapper">
+
+	<select id="selectProfessorByStuInfo" parameterType="str"
+		resultType="str">
+		select name from account where account_no=(select
+		account_no from professor
+		where
+		pro_no=(select pro_no from advisor where
+		student_no=(select student_no from student
+		where
+		account_no=#{account_no})))
+	</select>
+
+	<select id="selectStudent_noByStuInfo" parameterType="str"
+		resultType="int">
+		select student_no from student where
+		account_no=#{account_no}
+	</select>
+
+	<select id="selectStatus_nmByStuInfo" parameterType="str"
+		resultType="str">
+		select status_nm from common_code_detail where
+		status_cd=(select status_cd
+		from student where
+		account_no=#{account_no})
+	</select>
+
+	<!-- 학과명 조회 -->
+	<select id="selectDept_nmByStuInfo" parameterType="str"
+		resultType="str">
+		select dept_nm from department where dept_cd=(select
+		dept_cd from student
+		where account_no=#{account_no})
+	</select>
+
+	<select id="selectDept_nm2ByStuInfo" parameterType="str"
+		resultType="str">
+		select dept_nm from department where dept_cd=(select
+		plural_majordept_cd
+		from student
+		where account_no=#{account_no})
+	</select>
+
+	<select id="selectPersonalInfoByStuInfo" parameterType="str"
+		resultType="stuInfo">
+		select name, picture, email, address, detail_add, phone,
+		registdate from
+		applicant where applicant_no=(select applicant_no from
+		student
+		where account_no=#{account_no}) and pass_whether='Y' and
+		regist_check='Y'
+	</select>
+
+	<select id="selectPictureByStuInfo" parameterType="str"
+		resultType="stuInfo">
+		select picture from applicant where applicant_no=(select
+		applicant_no from
+		student
+		where account_no=#{account_no}) and
+		pass_whether='Y' and regist_check='Y'
+	</select>
+
+
+	<select id="selectGenderByStuInfo" parameterType="str"
+		resultType="str">
+		select gender from account where account_no=#{account_no}
+	</select>
+
+	<!-- 계정계좌정보 -->
+	<select id="selectBankInfoByStuInfo" parameterType="str"
+		resultType="stuInfo">
+		select * from student_acunt where student_no=(select
+		student_no from student
+		where account_no=#{account_no})
+	</select>
+
+	<select id="selectFaculty_nmByStuInfo" parameterType="str"
+		resultType="str">
+		select faculty_nm from faculty where faculty_cd=(select
+		faculty_code from
+		student where account_no=#{account_no})
+	</select>
+
+	<!-- 학생의 기본정보,계좌정보,학과정보 -->
+	<select id="selectStdBasicAcuntDeptInfor" parameterType="str"
+		resultType="stuInfo">
+		select a.*, b.student_no, b.dept_cd, c.dept_nm,
+		d.acunt_bank,
+		d.acunt_nn, d.acunt_no
+		from account a, student b,
+		department c, student_acunt d
+		where a.account_no=b.account_no and
+		b.dept_cd=c.dept_cd and
+		b.student_no=d.student_no(+)
+		and
+		a.account_no=#{account_no}
+	</select>
+
+	<update id="updateBankInfo" parameterType="stuInfo">
+		update student_acunt
+		set acunt_nn=#{acunt_nn}, acunt_bank=#{acunt_bank},
+		acunt_no=#{acunt_no}
+		where student_no=(select student_no from student
+		where
+		account_no=#{account_no})
+	</update>
+
+	<update id="updateStuInfo" parameterType="stuInfo">
+		update applicant set
+		email=#{email}, phone=#{phone}, address=#{address},
+		detail_add=#{detail_add}, picture=#{picture}
+		where applicant_no=(select
+		applicant_no from student where
+		account_no=#{account_no})
+	</update>
+
+	<select id="selectLectureSemester" resultType="int">
+		select count(distinct lecture_semester) student_no
+  		from grades
+  		where student_no=#{student_no}
+	</select>
+
+</mapper>

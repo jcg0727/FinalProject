@@ -1,0 +1,21 @@
+package kr.ac.hs.dao.grades;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.dto.grades.GradesVO;
+
+public interface GradesDAO {
+	public List<GradesVO> selectGradesByStudentNo(String student_no) throws SQLException;
+
+	double selectPreviousSemesterGradesByStudnetNo(String student_no) throws SQLException;
+
+	public List<GradesVO> selectThisSemesterGradesByStudentNo(GradesVO grades,SearchCriteria cri) throws SQLException;
+	
+	public List<GradesVO> selectGradesBySemester(GradesVO grades,SearchCriteria cri) throws SQLException;
+
+	public GradesVO selectTotalGradesByStudentNo(String student_no) throws SQLException;
+
+	public List<String> selectSemesterListByStudentNo(String student_no) throws SQLException;
+}

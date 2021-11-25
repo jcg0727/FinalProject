@@ -1,0 +1,28 @@
+package kr.ac.hs.dao.attendance;
+
+import java.sql.SQLException;
+
+import org.apache.ibatis.session.SqlSession;
+
+import kr.ac.hs.command.attendance.AttendanceCommand;
+
+public class AttendanceDAOImpl implements AttendanceDAO {
+
+	private SqlSession session;
+
+	public void setSqlSession(SqlSession session) {
+		this.session = session;
+	}
+
+	@Override
+	public String insertAttendance(AttendanceCommand cmd) throws SQLException {
+		session.insert("Attendance-Mapper.insertAttendance", cmd);
+		return "OK";
+	}
+	
+	
+	
+	
+	
+	
+}

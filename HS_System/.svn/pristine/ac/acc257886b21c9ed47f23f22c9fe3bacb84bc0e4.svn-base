@@ -1,0 +1,26 @@
+package kr.ac.hs.service.attendance;
+
+import java.sql.SQLException;
+
+import kr.ac.hs.command.attendance.AttendanceCommand;
+import kr.ac.hs.dao.attendance.AttendanceDAO;
+
+public class AttendanceServiceImpl implements AttendanceService {
+
+	private AttendanceDAO attendanceDAO;
+	
+	public void setAttendanceDAO (AttendanceDAO attendanceDAO) {
+		this.attendanceDAO = attendanceDAO;
+	}
+
+	@Override
+	public String registAttendance(AttendanceCommand cmd) throws SQLException {
+		
+		attendanceDAO.insertAttendance(cmd);
+		
+		return "OK";
+	}
+	
+	
+	
+}

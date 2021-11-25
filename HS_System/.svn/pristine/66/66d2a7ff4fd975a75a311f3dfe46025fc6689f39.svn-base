@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="ExSugangList-Mapper">
+
+	<sql id="search">	
+		<if test="cri.searchType != null and cri.searchType != ''">
+			and substr(B.lecture_semester,1,4)=#{cri.searchType}			
+		</if>
+	</sql>	
+	<sql id="search2">	
+		<if test="cri.searchType2 != null and cri.searchType2 != ''">
+			and substr(B.lecture_semester,6,6)=#{cri.searchType2}			
+		</if>
+	</sql>	
+
+	<select id="sugangInfoBystudent_no" resultType="exSugang">
+		select A.name, C.student_no,
+		(select count(distinct lecture_semester) from grades where student_no=#{student_no})as semester, B.dept_nm,
+		(
+		select SUM(A.class_grade)
+		from lecture A, lecture_register B
+		where A.class_no=B.class_no
+		and B.student_no=#{student_no}
+		and B.status_cd='CCDN001' 
+		and B.lecture_semester=#{lecture_semester})as lectureCount
+		from applicant A, department B, student C
+		where A.dept_cd = B.dept_cd
+		and A.applicant_no = C.applicant_no
+		and C.student_no=#{student_no}
+	</select>
+	
+	<select id="selectTookClassesByStudent_no" resultType="exSugang">
+		select 
+    	row_number() over(order by (B.lecture_semester))as no,
+    	substr(B.lecture_semester,1,4)as year,
+    	substr(B.lecture_semester,6,6)as seme,
+    	A.class_type, B.class_no, A.class_name, A.class_grade, B.grades_cd
+		from lecture A, grades B
+		where A.class_no=B.class_no
+    	and A.lecture_semester=B.lecture_semester
+    	and B.student_no=#{student_no}
+	</select>
+	
+	<select id="selectCountTookClassesByStudent_no" resultType="int">
+		select count(*)
+		from lecture A, grades B
+		where A.class_no=B.class_no
+    	and A.lecture_semester=B.lecture_semester
+    	and B.student_no=#{student_no}
+    	<include refid="search" />
+    	<include refid="search2" />
+	</select>
+	
+	<select id="selectClassesOpenThisSemester" resultType="exSugang">
+		select A.class_no
+		from grades A, lecture B
+		where A.class_no=B.class_no
+		and B.LECTURE_SEMESTER = #{lecture_semester}
+		and A.student_no=#{student_no}
+		and B.status_cd='CCDR003'
+	</select>
+	
+	<select id="selectSearchTookClassesByStudent_no" resultType="exSugang">
+		select 
+    	row_number() over(order by (B.lecture_semester))as no,
+    	substr(B.lecture_semester,1,4)as year,
+    	substr(B.lecture_semester,6,6)as seme,
+    	A.class_type, B.class_no, A.class_name, A.class_grade, B.grades_cd
+		from lecture A, grades B
+		where A.class_no=B.class_no
+    	and A.lecture_semester=B.lecture_semester
+    	and B.student_no=#{student_no}
+    	<include refid="search" />
+    	<include refid="search2" />
+	</select>
+	
+	<select id="selectListYear" resultType="exSugang">
+		select 
+    	distinct substr(B.lecture_semester,1,4)as year  
+		from lecture A, grades B
+		where A.class_no=B.class_no
+    	and A.lecture_semester=B.lecture_semester
+    	and B.student_no=#{student_no}
+    	order by substr(B.lecture_semester,1,4) asc
+	</select>
+
+</mapper>

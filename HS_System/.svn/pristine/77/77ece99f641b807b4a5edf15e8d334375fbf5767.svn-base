@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="Graduation-Mapper">
+
+	<sql id="search">	
+		<if test="cri.searchType == 'no'.toString()">
+			and A.student_no like '%'||#{cri.keyword}||'%'			
+		</if>
+		<if test="cri.searchType == 'nm'.toString()">
+			and C.name like '%'||#{cri.keyword}||'%'		
+		</if>
+		<if test="cri.searchType == 'th'.toString()">
+			and E.orginal_nm like '%'||#{cri.keyword}||'%'
+		</if>		
+	</sql>
+	
+	<select id="selectJPbyStudent_no" resultType="int">
+		select nvl(sum(A.class_grade),0)as jp
+		from lecture A, grades B
+		where A.lecture_semester=B.lecture_semester
+		and A.class_no = B.class_no
+		and B.student_no=#{student_no}
+		and A.class_type='전필'
+	</select>
+	
+	<select id="selectJSbyStudent_no" resultType="int">
+		select nvl(sum(A.class_grade),0)as js
+		from lecture A, grades B
+		where A.lecture_semester=B.lecture_semester
+		and A.class_no = B.class_no
+		and B.student_no=#{student_no}
+		and A.class_type='전선'
+	</select>
+	
+	<select id="selectGPbyStudent_no" resultType="int">
+		select nvl(sum(A.class_grade),0)as gp
+		from lecture A, grades B
+		where A.lecture_semester=B.lecture_semester
+		and A.class_no = B.class_no
+		and B.student_no=#{student_no}
+		and A.class_type='교필'
+	</select>
+	
+	<select id="selectGSbyStudent_no" resultType="int">
+		select nvl(sum(A.class_grade),0)as gs
+		from lecture A, grades B
+		where A.lecture_semester=B.lecture_semester
+		and A.class_no = B.class_no
+		and B.student_no=#{student_no}
+		and A.class_type='교선'
+	</select>
+	
+	<insert id="insertGrad_thesis" parameterType="graduation">
+		insert into grad_thesis (student_no, attach_no, status_cd)values(#{student_no},#{attach_no},'CCDQ001')
+	</insert>
+	
+	<insert id="insertGraduated">
+		insert into graduated (student_no) values (#{student_no})
+	</insert>
+	
+	<select id="selectFilenameStatusByStudent_no" resultType="graduation">
+		 select A.orginal_nm, A.extension, C.status_nm
+		 from attachment A, grad_thesis B, common_code_detail C
+		 where A.attach_no=B.attach_no
+		 and C.status_cd = B.status_cd
+		 and B.student_no=#{student_no}
+	</select>
+	
+	<delete id="removeFromGrad_thesis">
+		delete from grad_thesis where student_no=#{student_no}
+	</delete>
+
+	<delete id="removeFromGraduated">
+		delete from graduated where student_no=#{student_no}
+	</delete>
+	
+	<delete id="removeFromAttachment">
+		delete from attachment where attach_no=#{attach_no}
+	</delete>
+	
+	
+	
+	
+	
+	
+	
+	
+	<select id="selectThesisByPro_no" resultType="graduation">
+		select 
+		row_number() over(order by A.student_no)as num,
+		A.student_no, C.name, A.attach_no, A.status_cd, E.orginal_nm
+		from grad_thesis A, advisor B, account C, student D, attachment E
+		where A.student_no=B.student_no
+		and B.student_no=D.student_no
+		and C.account_no=D.account_no
+		and E.attach_no=A.attach_no
+		and B.pro_no=#{pro_no}
+		and A.status_cd='CCDQ001'
+	
+	</select>
+
+	<select id="selectThesisByPro_noSearch" resultType="graduation">
+		select 
+		row_number() over(order by A.student_no)as num,
+		A.student_no, C.name, A.attach_no, A.status_cd, E.orginal_nm
+		from grad_thesis A, advisor B, account C, student D, attachment E
+		where A.student_no=B.student_no
+		and B.student_no=D.student_no
+		and C.account_no=D.account_no
+		and E.attach_no=A.attach_no
+		and B.pro_no=#{pro_no}
+		and A.status_cd='CCDQ001'
+		<include refid="search" />
+	
+	</select>
+
+	<select id="selectThesisByPro_noSearchCount" resultType="int">
+		select 
+		count(*)
+		from grad_thesis A, advisor B, account C, student D, attachment E
+		where A.student_no=B.student_no
+		and B.student_no=D.student_no
+		and C.account_no=D.account_no
+		and E.attach_no=A.attach_no
+		and B.pro_no=#{pro_no}
+		and A.status_cd='CCDQ001'
+		<include refid="search" />
+	
+	</select>
+	
+	<update id="updateStatus_cdOnGrad_thesis">
+		update grad_thesis set status_cd='CCDQ002' 
+		where student_no=#{student_no}
+	</update>
+	
+	<update id="updateStatus_cdOnGraduated">
+		update graduated set status_cd='CCDP002'
+		where student_no=#{student_no}
+	</update>
+	
+	<select id="selectAccount_no" resultType="str">
+		select account_no from student where student_no=#{student_no}
+	</select>
+</mapper>

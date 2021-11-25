@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="Freshmen-Mapper">
+
+	<sql id="search">	
+		<if test="cri.searchType == 'nm'.toString()">
+			and B.name like '%'||#{cri.keyword}||'%'			
+		</if>
+		<if test="cri.searchType == 'nb'.toString()">
+			and A.student_no like '%'||#{cri.keyword}||'%'			
+		</if>
+		<if test="cri.searchType == 'yn'.toString()">
+			and (select nvl(max(name),'N') from account where account_no=(select account_no from professor
+        	where pro_no=(select pro_no from advisor where student_no=A.student_no))) like '%'||#{cri.keyword}||'%'			
+		</if>		
+	</sql>	
+
+	<sql id="search2">	
+		<if test="cri.searchType == 'nm'.toString()">
+			and A.name like '%'||#{cri.keyword}||'%'			
+		</if>
+		<if test="cri.searchType == 'nb'.toString()">
+			and B.pro_no like '%'||#{cri.keyword}||'%'			
+		</if>
+	</sql>	
+	
+   <select id="selectDept_nmByStaff_no" resultType="str">
+		select dept_nm from department where dept_cd=(select dept_cd from staff where staff_no=#{staff_no})
+	</select>
+	
+	<select id="selectItemsByStaff_no" resultType="freshmen">
+		select
+        row_number() over(order by A.student_no)as num,A.student_no, B.name, B.phone,  
+        (select nvl(max(name),'N') from account where account_no=(select account_no from professor
+        where pro_no=(select pro_no from advisor where student_no=A.student_no))) as professorYN
+        from student A, applicant B, staff C
+		where A.applicant_no=B.applicant_no
+		and C.dept_cd=A.dept_cd
+		and C.staff_no=#{staff_no}
+		and A.student_no like (SELECT SUBSTR(TO_CHAR(TO_DATE(SYSDATE), 'YYYYMMDD'),1,4)from dual)||'%'
+		and B.pass_whether='Y'
+		and B.regist_check='Y'
+	</select>
+
+	<select id="selectSearchItemsByStaff_no" parameterType="java.util.Map" resultType="freshmen">
+		select
+        row_number() over(order by A.student_no)as num,A.student_no, B.name, B.phone,  
+        (select nvl(max(name),'N') from account where account_no=(select account_no from professor
+        where pro_no=(select pro_no from advisor where student_no=A.student_no))) as professorYN
+        from student A, applicant B, staff C
+		where A.applicant_no=B.applicant_no
+		and C.dept_cd=A.dept_cd
+		and C.staff_no=#{staff_no}
+		and A.student_no like (SELECT SUBSTR(TO_CHAR(TO_DATE(SYSDATE), 'YYYYMMDD'),1,4)from dual)||'%'
+		and B.pass_whether='Y'
+		and B.regist_check='Y'
+		<include refid="search" />
+	</select>
+
+	<select id="selectSearchItemsByStaff_noCount" parameterType="java.util.Map" resultType="int">
+		select count(*) from student A, applicant B, staff C 
+		where A.applicant_no=B.applicant_no
+		and  C.dept_cd=A.dept_cd
+		and C.staff_no=#{staff_no}
+		and A.student_no like (SELECT SUBSTR(TO_CHAR(TO_DATE(SYSDATE), 'YYYYMMDD'),1,4)from dual)||'%'
+		and B.pass_whether='Y'
+		and B.regist_check='Y'
+		<include refid="search" />
+	</select>
+	
+	<select id="selectDetailByStudent_no" parameterType="str" resultType="freshmen">
+		select A.name, A.gender, B.email, B.phone, B.Address, B.detail_add, C.status_nm
+		from account A, applicant B, common_code_detail C, student D
+		where D.account_no=A.account_no
+		and B.applicant_no=D.applicant_no
+		and C.status_cd=D.status_cd
+		and D.student_no=#{student_no}
+	</select>
+	
+	<select id="selectProfessorListByDept_nm" parameterType="str" resultType="freshmen">
+		select row_number() over(order by (select count(*) from advisor where pro_no=B.pro_no))as num, A.name, B.pro_no,
+		(select count(*) from advisor where pro_no=B.pro_no)as perStu
+		from account A, professor B, department C 
+		where A.account_no=B.account_no
+		and B.dept_cd=C.dept_cd
+		and B.dept_cd=(select dept_cd from department where dept_nm=#{dept_nm})
+	</select>
+
+	<select id="selectSearchProfessorListByDept_nm" parameterType="java.util.Map" resultType="freshmen">
+		select row_number() over(order by (select count(*) from advisor where pro_no=B.pro_no))as num, A.name, B.pro_no,
+		(select count(*) from advisor where pro_no=B.pro_no)as perStu
+		from account A, professor B, department C 
+		where A.account_no=B.account_no
+		and B.dept_cd=C.dept_cd
+		and B.dept_cd=(select dept_cd from department where dept_nm=#{dept_nm})
+		<include refid="search2" />
+	</select>
+   
+   <select id="selectCountProfessorListByDept_nm" parameterType="java.util.Map" resultType="int">
+		select count(*)
+		from account A, professor B, department C 
+		where A.account_no=B.account_no
+		and B.dept_cd=C.dept_cd
+		and B.dept_cd=(select dept_cd from department where dept_nm=#{dept_nm})
+		<include refid="search2" />
+   </select>
+   
+   <!-- 지도교수 수정 -->
+   <update id="updateAdvisor">
+   		update advisor set pro_no=#{pro_no} where student_no=#{student_no}
+   </update>
+   
+ <!--   <insert id="insertAdvisor">
+   		insert into advisor (student_no, pro_no) values(#{student_no},#{pro_no})
+   </insert> -->
+
+</mapper>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace ="Staff-Mapper">
+	
+	<select id="selectStaffbyStaffNo" parameterType="str" resultType="staff">
+		select *
+		from staff A, account B
+		where staff_no= #{staff_no}
+		AND a.account_no = b.account_no
+
+	</select>
+
+</mapper>

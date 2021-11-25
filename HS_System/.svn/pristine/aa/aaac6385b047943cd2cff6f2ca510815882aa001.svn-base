@@ -1,0 +1,16 @@
+package kr.ac.hs.service.lecture;
+
+import kr.ac.hs.dao.lecture.LectureManagementProfDAO;
+
+public class LectureManagementProfServiceImpl implements LectureManagementProfDAO{
+	
+	private LectureManagementProfDAO lectureManagementcProfDAO;
+	
+	public void setLectureManagementProfDAO (LectureManagementProfDAO lectureManagementcProfDAO) {
+		this.lectureManagementcProfDAO = lectureManagementcProfDAO;
+	}
+
+	
+	
+
+}

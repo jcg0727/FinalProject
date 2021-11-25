@@ -1,0 +1,131 @@
+package kr.ac.hs.controller.applicant;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.ac.hs.command.SearchCriteria;
+import kr.ac.hs.command.applicant.StaffApplicantCommand;
+import kr.ac.hs.dto.AccountVO;
+import kr.ac.hs.dto.applicant.StaffApplicantVO;
+import kr.ac.hs.service.applicant.StaffApplicantService;
+
+@Controller
+//@RequestMapping("/academic/admission")
+public class StaffApplicantController {
+	
+	@Autowired
+	private StaffApplicantService staffApplicantService;
+	
+/*	@RequestMapping(value="/academic/admission/candidate", method=RequestMethod.GET)
+	public String applicantMain() throws Exception{
+		String url = "academic/staff/applicantManagement";
+		return url;
+	}*/
+
+	@RequestMapping("/academic/admission/candidate")
+	public ModelAndView applicantMain(SearchCriteria cri, ModelAndView mnv, HttpSession session, Map<String, Object> dataMap) throws Exception{
+		String url = "academic/staff/applicantManagement";
+		AccountVO loginUser = (AccountVO) session.getAttribute("loginUser");
+		
+		cri.setPerPageNum(5);
+		
+		dataMap.put("cri", cri);
+		dataMap.put("staff_no", loginUser.getId());
+		
+		if(loginUser.getAuthority_cd().equals("ROLE_ACADEMIC")) {
+			dataMap = staffApplicantService.getListSelectApplicant(dataMap);
+		}
+		
+		mnv.addObject("dataMap" , dataMap);
+		mnv.setViewName(url);
+		
+		return mnv;
+	}	
+	
+	/*@RequestMapping(value="/academic/admission/candidate/list", method=RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getList(@RequestBody StaffApplicantCommand cmd , HttpSession session) throws Exception{
+		ResponseEntity<Map<String, Object>> entity = null;
+		
+		Map<String,Object> dataMap = new HashMap<String, Object>();
+		cmd.setPerPageNum(5);
+		
+		dataMap.put("dept_nm", cmd.getDept_nm());
+		dataMap.put("applicant_no", cmd.getApplicant_no());
+		dataMap.put("pass_whether", cmd.getPass_whether());
+		dataMap.put("regist_check", cmd.getRegist_check());
+		dataMap.put("name", cmd.getName());
+		
+		try {
+			Map<String, Object> resultMap = staffApplicantService.getListSelectApplicant(dataMap);
+			entity = new ResponseEntity<Map<String,Object>>(resultMap, HttpStatus.OK);
+		}catch (Exception e) {
+			entity = new ResponseEntity<Map<String,Object>>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+		
+	}*/
+
+	@RequestMapping(value="/academic/admission/candidate/detail")
+	@ResponseBody
+	public ResponseEntity<StaffApplicantVO> detail(@RequestParam("applicant_no") String applicant_no) throws Exception{
+		
+		ResponseEntity<StaffApplicantVO> entity = null;
+		
+		try {
+			StaffApplicantVO staffApplicantVO = staffApplicantService.getDetail(applicant_no);
+			entity = new ResponseEntity<StaffApplicantVO>(staffApplicantVO, HttpStatus.OK);
+		}catch (Exception e) {
+			entity = new ResponseEntity<StaffApplicantVO>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	@RequestMapping(value="/academic/admission/candidate/change")
+	@ResponseBody
+	public ResponseEntity<StaffApplicantVO> update(StaffApplicantCommand cmd) throws Exception{
+		
+		ResponseEntity<StaffApplicantVO> entity = null;
+		
+		StaffApplicantVO staffApplicantVO = cmd.toVO();
+		System.out.println("applicant_no : " + staffApplicantVO.getApplicant_no());
+		System.out.println("pass_w : " + staffApplicantVO.getPass_whether());
+		
+		try {
+			staffApplicantService.modifyApplicantPassOrFail(staffApplicantVO);
+			entity = new ResponseEntity<StaffApplicantVO>(staffApplicantVO, HttpStatus.OK);
+		}catch(Exception e) {
+			entity = new ResponseEntity<StaffApplicantVO>(HttpStatus.BAD_REQUEST);
+		}
+		
+		return entity;
+	}
+
+	@RequestMapping(value="/academic/admission/candidate/insert")
+	@ResponseBody
+	public ResponseEntity<String> insert(String applicant_no) throws Exception{
+		
+		ResponseEntity<String> entity = null;
+		
+		//StaffApplicantVO staffApplicantVO = cmd.toInsertStudentVO();
+		
+		try {
+			staffApplicantService.registApplicantToStudent(applicant_no);
+			entity = new ResponseEntity<String>(applicant_no, HttpStatus.OK);
+		}catch(Exception e) {
+			entity = new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+		}
+		
+		return entity;
+	}
+}
